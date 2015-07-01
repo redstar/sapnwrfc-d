@@ -1,0 +1,9 @@
+{
+	"name": "sapnwrfc-d",
+	"description": "SAP NetWeaver RFC binding for D.",
+	"license": "BSD 3-clause",
+	"copyright": "Copyright (C) 2015, Kai Nacke",
+	"authors": ["Kai Nacke"],
+	"targetType": "library",
+	"libs": ["sapnwrfc"]
+}
