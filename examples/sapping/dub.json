@@ -1,0 +1,9 @@
+{
+	"name": "sapping",
+	"description": "Connection test for SAP systems",
+	"copyright": "Copyright (C) 2015, Kai Nacke",
+	"authors": ["Kai Nacke"],
+	"dependencies": {
+		"sapnwrfc-d": { "version": "~master", "path": "../../" }
+	}
+}
