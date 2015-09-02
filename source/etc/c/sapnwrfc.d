@@ -125,42 +125,42 @@ struct RFC_ERROR_INFO
 {
     RFC_RC code;
     RFC_ERROR_GROUP group;
-    SAP_UC key[128];
-    SAP_UC message[512];
-    SAP_UC abapMsgClass[20+1];
-    SAP_UC abapMsgType[1+1];
-    RFC_NUM abapMsgNumber[3 + 1];
-    SAP_UC abapMsgV1[50+1];
-    SAP_UC abapMsgV2[50+1];
-    SAP_UC abapMsgV3[50+1];
-    SAP_UC abapMsgV4[50+1];
+    SAP_UC[128] key;
+    SAP_UC[512] message;
+    SAP_UC[20+1] abapMsgClass;
+    SAP_UC[1+1] abapMsgType;
+    RFC_NUM[3 + 1] abapMsgNumber;
+    SAP_UC[50+1] abapMsgV1;
+    SAP_UC[50+1] abapMsgV2;
+    SAP_UC[50+1] abapMsgV3;
+    SAP_UC[50+1] abapMsgV4;
 }
 
 struct RFC_ATTRIBUTES
 {
-    SAP_UC dest[64+1];
-    SAP_UC host[100+1];
-    SAP_UC partnerHost[100+1];
-    SAP_UC sysNumber[2+1];
-    SAP_UC sysId[8+1];
-    SAP_UC client[3+1];
-    SAP_UC user[12+1];
-    SAP_UC language[2+1];
-    SAP_UC trace[1+1];
-    SAP_UC isoLanguage[2+1];
-    SAP_UC codepage[4+1];
-    SAP_UC partnerCodepage[4+1];
-    SAP_UC rfcRole[1+1];
-    SAP_UC type[1+1];
-    SAP_UC partnerType[1+1];
-    SAP_UC rel[4+1];
-    SAP_UC partnerRel[4+1];
-    SAP_UC kernelRel[4+1];
-    SAP_UC cpicConvId[8 + 1];
-    SAP_UC progName[128+1];
-    SAP_UC partnerBytesPerChar[1+1];
-    SAP_UC partnerSystemCodepage[4 + 1];
-    SAP_UC reserved[79];
+    SAP_UC[64+1] dest;
+    SAP_UC[100+1] host;
+    SAP_UC[100+1] partnerHost;
+    SAP_UC[2+1] sysNumber;
+    SAP_UC[8+1] sysId;
+    SAP_UC[3+1] client;
+    SAP_UC[12+1] user;
+    SAP_UC[2+1] language;
+    SAP_UC[1+1] trace;
+    SAP_UC[2+1] isoLanguage;
+    SAP_UC[4+1] codepage;
+    SAP_UC[4+1] partnerCodepage;
+    SAP_UC[1+1] rfcRole;
+    SAP_UC[1+1] type;
+    SAP_UC[1+1] partnerType;
+    SAP_UC[4+1] rel;
+    SAP_UC[4+1] partnerRel;
+    SAP_UC[4+1] kernelRel;
+    SAP_UC[8 + 1] cpicConvId;
+    SAP_UC[128+1] progName;
+    SAP_UC[1+1] partnerBytesPerChar;
+    SAP_UC[4 + 1] partnerSystemCodepage;
+    SAP_UC[79] reserved;
 }
 alias P_RFC_ATTRIBUTES = RFC_ATTRIBUTES*;
 
@@ -184,11 +184,11 @@ struct RFC_UNIT_ATTRIBUTES
     short unitHistory;
     short lock;
     short noCommitCheck;
-    SAP_UC user[12+1];
-    SAP_UC client[3+1];
-    SAP_UC tCode[20+1];
-    SAP_UC program[40+1];
-    SAP_UC hostname[40+1];
+    SAP_UC[12+1] user;
+    SAP_UC[3+1] client;
+    SAP_UC[20+1] tCode;
+    SAP_UC[40+1] program;
+    SAP_UC[40+1] hostname;
     RFC_DATE sendingDate;
     RFC_TIME sendingTime;
 }
@@ -322,8 +322,8 @@ alias P_RFC_PARAMETER_DESC = RFC_PARAMETER_DESC*;
 
 struct RFC_EXCEPTION_DESC
 {
-    SAP_UC key[128];
-    SAP_UC message[512];
+    SAP_UC[128] key;
+    SAP_UC[512] message;
 }
 RFC_EXCEPTION_DESC* P__RFC_EXCEPTION_DESC;
 
@@ -584,7 +584,7 @@ alias	RFC_METADATA_QUERY_RESULT_HANDLE = void*;
 struct RFC_METADATA_QUERY_RESULT_ENTRY
 {
     RFC_ABAP_NAME name;
-    SAP_UC errorMessage[512];
+    SAP_UC[512] errorMessage;
 }
 
 enum RFC_METADATA_OBJ_TYPE
