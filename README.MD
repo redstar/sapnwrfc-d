@@ -9,7 +9,7 @@ This library provides bindings [D programming language](http://dlang.org) for th
 Prerequisite
 ------------
 
-You need to download and install the SAP NetWeaver RFC SDK for your OS from http://service.sap.com/swdc. For further information see SAP note 1025361.
+You need to download and install the SAP NetWeaver RFC SDK for your OS from http://service.sap.com/swdc. For further information see [SAP note 1025361](http://service.sap.com/sap/support/notes/1025361).
 The SAP NetWeaver RFC SDK is copyrighted software and is only available through the official channels mentioned above. It is strongly recommended to download the provided SDK documentation, too.
 
 Installation
@@ -33,13 +33,18 @@ Examples
 
 Examples are provided in the `examples` folder.
 
+Functionality
+-------------
+
+- Prototypes for (most) C functions of the SAP NetWeaver RFC SDK.
+- Decorated functions which throw a `SAPException` in case of error.
+
 Limitations
 -----------
 
 - Currently there are no bindings for the decimal data types `DecFloat16` and `DecFloat34`.
 - The prototypes are still reworked to use `out` and other type modifiers.
 - A high level API is missing. Ideas include:
-  - An exception should be used instead of return code checking
   - The C style string handling should be replaced with D strings
   - Data containers should provide a range interface
   - ...
