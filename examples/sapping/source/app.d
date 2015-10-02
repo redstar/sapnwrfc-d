@@ -1,10 +1,11 @@
-/* Example application for SAP NetWeaver RFC
+﻿/* Example application for SAP NetWeaver RFC
    Connect to SAP system, call ping and display information from RFC_SYSTEM_INFO.
 */
-import etc.c.sapnwrfc;
+import std.sap;
 import std.conv;
 import std.stdio;
 import std.string;
+import std.typetuple;
 import std.utf;
 
 version(Windows)
@@ -21,7 +22,64 @@ else
     }
 }
 
-enum VERSION = "0.1";
+enum VERSION = "0.2";
+
+alias KEYWORDS = TypeTuple!(
+    // General Connection parameters
+    "DEST",
+    "SAPROUTER",
+    "SNC_LIB",
+    "SNC_MYNAME",
+    "SNC_PARTNERNAME",
+    "SNC_QOP",
+    "TRACE",
+    "PCS",
+    "CODEPAGE",
+    "NO_COMPRESSION",
+    "ON_CCE",
+    "CFIT",
+    
+    // Parameters used in client programs
+    "USER",
+    "PASSWD",
+    "CLIENT",
+    "LANG",
+    "PASSWORD_CHANGE_ENFORCED",
+    "SNC_SSO",
+    "USE_SYMBOLIC_NAMES",
+    "MYSAPSSO2",
+    "GETSSO2",
+    "X509CERT",
+    "EXTIDDATA",
+    "EXTIDTYPE",
+    "LCHECK",
+    "USE_SAPGUI",
+    "ABAP_DEBUG",
+    "DELTA",
+    
+    // Parameters for direct application server logon
+    "ASHOST",
+    "SYSNR",
+
+    // Parameters for load balancing
+    "MSHOST",
+    "MSSERV",
+    "R3NAME",
+    "SYSID",
+    "GROUP",
+    
+    // Parameters used in server programs
+    "GWHOST",
+    "GWSERV",
+    "PROGRAM_ID",
+    "TPNAME",
+
+    "RFC_TRACE",
+    "RFC_TRACE_DIR",
+    "RFC_TRACE_TYPE",
+    "RFC_TRACE_ENCODING",
+    "CPIC_TRACE",
+);
 
 class ExitException : Exception
 {
@@ -43,21 +101,15 @@ void usage(int rc = 1)
     writefln("    -h    This help text");
     writefln("    -v    Enable verbose output");
     writefln("\nRecognized keys:");
-    writefln("    GATEWAY");
-    writefln("    ASHOST");
-    writefln("    SYSNR");
-    writefln("    MSHOST");
-    writefln("    MSSERV");
-    writefln("    R3NAME");
-    writefln("    GROUP");
-    writefln("    CLIENT");
-    writefln("    USER");
-    writefln("    PASSWD");
-    writefln("    LANG");
-    writefln("    DEST");
-    writefln("    TRACE");
-    writefln("    ABAP_DEBUG");
-    writefln("    NO_COMPRESSION");
+    short col = 0;
+    foreach (key; KEYWORDS)
+    {
+        if (col == 0) write("   ");
+        writef(" %-24s", key);
+        if (col == 2) writeln();
+        col = (col + 1) % 3;
+    }
+    writeln();
     writefln("\nExamples:");
     writefln("    sapping CLIENT=100 USER=techuser PASSWD=secret MSHOST=10.0.5.42 R3NAME=X07 MSSERV=5801 GROUP=PROD_GROUP");
     writefln("    sapping CLIENT=100 USER=techuser PASSWD=secret ASHOST=10.0.5.42 SYSNR=07");
@@ -119,22 +171,11 @@ int run(string[] args)
 
         switch (kv[0])
         {
-            case "GATEWAY": conParams ~= RFC_CONNECTION_PARAMETER(cU("gateway"), cU(kv[1])); break;
-            case "ASHOST": conParams ~= RFC_CONNECTION_PARAMETER(cU("ashost"), cU(kv[1])); break;
-            case "MSHOST": conParams ~= RFC_CONNECTION_PARAMETER(cU("mshost"), cU(kv[1])); break;
-            case "MSSERV": conParams ~= RFC_CONNECTION_PARAMETER(cU("msserv"), cU(kv[1])); break;
-            case "R3NAME": conParams ~= RFC_CONNECTION_PARAMETER(cU("r3name"), cU(kv[1])); break;
-            case "GROUP": conParams ~= RFC_CONNECTION_PARAMETER(cU("group"), cU(kv[1])); break;
-            case "SYSNR": conParams ~= RFC_CONNECTION_PARAMETER(cU("sysnr"), cU(kv[1])); break;
-            case "CLIENT": conParams ~= RFC_CONNECTION_PARAMETER(cU("client"), cU(kv[1])); break;
-            case "USER": conParams ~= RFC_CONNECTION_PARAMETER(cU("user"), cU(kv[1])); break;
-            case "PASSWD": conParams ~= RFC_CONNECTION_PARAMETER(cU("passwd"), cU(kv[1])); break;
-            case "LANG": conParams ~= RFC_CONNECTION_PARAMETER(cU("lang"), cU(kv[1])); break;
-            case "DEST": conParams ~= RFC_CONNECTION_PARAMETER(cU("dest"), cU(kv[1])); break;
-            case "TRACE": conParams ~= RFC_CONNECTION_PARAMETER(cU("trace"), cU(kv[1])); break;
-            case "ABAP_DEBUG": conParams ~= RFC_CONNECTION_PARAMETER(cU("abap_debug"), cU(kv[1])); break;
-            case "NO_COMPRESSION": conParams ~= RFC_CONNECTION_PARAMETER(cU("no_compression"), cU(kv[1])); break;
             default: usage();
+            foreach (key; KEYWORDS)
+            {
+                case key: conParams ~= RFC_CONNECTION_PARAMETER(cU(toLower(key)), cU(kv[1])); break;
+            }
         }
     }
 
@@ -145,30 +186,29 @@ int run(string[] args)
     RFC_ERROR_INFO errorInfo;
     auto connection = RfcOpenConnection(conParams.ptr, cast(uint)conParams.length, errorInfo);
     if (!connection) rfcError(errorInfo);
-    scope(exit) RfcCloseConnection(connection, errorInfo);
+    scope(exit) RfcCloseConnection(connection);
 
     if (verbose) writeln("Calling ping...");
-    if (RfcPing(connection, errorInfo) != RFC_RC.RFC_OK) rfcError(errorInfo);
+    RfcPing(connection);
 
     if (verbose) writeln("Calling system info...");
     auto desc = RfcGetFunctionDesc(connection, cU("RFC_SYSTEM_INFO"), errorInfo);
     if (!desc) rfcError(errorInfo);
     auto func = RfcCreateFunction(desc, errorInfo);
     if (!func) rfcError(errorInfo);
-    scope(exit) RfcDestroyFunction(func, errorInfo);
-    if (RfcInvoke(connection, func, errorInfo) != RFC_RC.RFC_OK) rfcError(errorInfo);
+    scope(exit) RfcDestroyFunction(func);
+    RfcInvoke(connection, func);
 
     if (verbose) writeln("Retrieving result data...");
     RFC_STRUCTURE_HANDLE rfcsiStructureHandle;
-    if (RfcGetStructure(func, cU("RFCSI_EXPORT"), rfcsiStructureHandle, errorInfo) != RFC_RC.RFC_OK) rfcError(errorInfo);
+    RfcGetStructure(func, cU("RFCSI_EXPORT"), rfcsiStructureHandle);
     if (verbose) writeln("Copying result data...");
     RFCSI_EXPORT rfcsiExport;
     foreach(wstring memberName; __traits(allMembers, RFCSI_EXPORT))
     {
         uint len;
         wchar[64] buffer;
-        if (RfcGetString(rfcsiStructureHandle, memberName.ptr, buffer.ptr, cast(uint) buffer.length, len, errorInfo) != RFC_RC.RFC_OK)
-            rfcError(errorInfo);
+        RfcGetString(rfcsiStructureHandle, memberName.ptr, buffer.ptr, cast(uint) buffer.length, len);
         __traits(getMember, rfcsiExport, memberName) = buffer[0..len].dup;
         //writefln("%s = %s", memberName, __traits(getMember, rfcsiExport, memberName));
     }
@@ -202,6 +242,12 @@ int main(string[] args)
     catch (ExitException e)
     {
         return e.rc;
+    }
+    catch (SAPException e)
+    {
+        writefln("Error occured %d %s", e.code, e.codeAsString);
+        writefln("'%s'", e.message);
+        return 100;
     }
     return 0;
 }

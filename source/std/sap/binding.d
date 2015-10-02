@@ -38,6 +38,12 @@ class SAPException : Exception
         return errorInfo.code;
     }
 
+    @property wstring codeAsString()
+    {
+        auto rcmsg = RfcGetRcAsString(errorInfo.code);
+        return cast(wstring)rcmsg[0 .. wcslen(rcmsg)];
+    }
+
     @property RFC_ERROR_GROUP group()
     {
         return errorInfo.group;
