@@ -39,6 +39,10 @@ Functionality
 - Prototypes for (most) C functions of the SAP NetWeaver RFC SDK.
 - Decorated functions which throw a `SAPException` in case of error.
 
+The functions of the SDK are imported with `import etc.c.sapnwrfc;`. This is the C API as documented in the SDK.
+You get additonally functionality if you use `import std.sap;`. Each function from the C API is available. All functions which have an `ERROR_INFO` parameter have an overloaded prototype without this argument. In case of an error these functions throw a `SAPException`.
+The use of module `std.sap` should be preferred because of the much easier error handling.
+
 Limitations
 -----------
 
