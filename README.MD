@@ -1,4 +1,4 @@
-D bindings for SAP NetWeaver RFC SDK
+﻿D bindings for SAP NetWeaver RFC SDK
 ====================================
 
 Summary
@@ -9,7 +9,7 @@ This library provides bindings [D programming language](http://dlang.org) for th
 Prerequisite
 ------------
 
-You need to download and install the SAP NetWeaver RFC SDK for your OS from http://service.sap.com/swdc. For further information see [SAP note 1025361](http://service.sap.com/sap/support/notes/1025361).
+You need to download and install the SAP NetWeaver RFC SDK for your OS from https://support.sap.com/swdc. For further information see [SAP note 1025361](http://service.sap.com/sap/support/notes/1025361).
 The SAP NetWeaver RFC SDK is copyrighted software and is only available through the official channels mentioned above. It is strongly recommended to download the provided SDK documentation, too.
 
 Installation
