@@ -118,14 +118,6 @@ void usage(int rc = 1)
 
 alias cU = toUTF16z;
 
-void rfcError(in RFC_ERROR_INFO errorInfo)
-{
-    auto rcmsg = RfcGetRcAsString(errorInfo.code);
-    writefln("Error occured %d %s", errorInfo.code, rcmsg[0 .. wcslen(rcmsg)]);
-    writefln("'%s'", errorInfo.message);
-    throw new ExitException(2);
-}
-
 struct RFCSI_EXPORT
 {
     wchar[/*3*/] RFCPROTO;
@@ -183,19 +175,15 @@ int run(string[] args)
         usage();
 
     if (verbose) writeln("Connecting...");
-    RFC_ERROR_INFO errorInfo;
-    auto connection = RfcOpenConnection(conParams.ptr, cast(uint)conParams.length, errorInfo);
-    if (!connection) rfcError(errorInfo);
+    auto connection = RfcOpenConnection(conParams);
     scope(exit) RfcCloseConnection(connection);
 
     if (verbose) writeln("Calling ping...");
     RfcPing(connection);
 
     if (verbose) writeln("Calling system info...");
-    auto desc = RfcGetFunctionDesc(connection, cU("RFC_SYSTEM_INFO"), errorInfo);
-    if (!desc) rfcError(errorInfo);
-    auto func = RfcCreateFunction(desc, errorInfo);
-    if (!func) rfcError(errorInfo);
+    auto desc = RfcGetFunctionDesc(connection, cU("RFC_SYSTEM_INFO"));
+    auto func = RfcCreateFunction(desc);
     scope(exit) RfcDestroyFunction(func);
     RfcInvoke(connection, func);
 

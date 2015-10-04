@@ -92,10 +92,10 @@ class SAPException : Exception
     }
 }
 
-private void enforce(in RFC_RC rc, in RFC_ERROR_INFO errorInfo,
+private void enforce(in RFC_ERROR_INFO errorInfo,
                      string file = __FILE__, size_t line = __LINE__)
 {
-    if (rc != RFC_RC.RFC_OK)
+    if (errorInfo.code != RFC_RC.RFC_OK)
     {
         throw new SAPException(errorInfo, file, line);
     }
@@ -122,21 +122,26 @@ private string generate()
         static if (is(typeof(__traits(getMember, mod, memberName)) == function))
         {
             alias member = helper!(__traits(getMember, mod, memberName));
-            static if (!is(ReturnType!member == void) && is(ReturnType!member == RFC_RC))
+
+            bool errorInfoSeen = false;
+            foreach(idx, argName; ParameterIdentifierTuple!member)
+                static if (is(ParameterTypeTuple!member[idx] == RFC_ERROR_INFO))
+                    errorInfoSeen = true;
+
+            if (errorInfoSeen)
             {
-                string head = "void " ~ memberName ~ "(";
+                bool hasReturn = !is(ReturnType!member == void) && !is(ReturnType!member == RFC_RC);
+                string head = (hasReturn ? ReturnType!member.stringof : "void") ~ " " ~ memberName ~ "(";
                 string src = "string file = __FILE__, size_t line = __LINE__) {\n"
                               "    RFC_ERROR_INFO errorInfo;\n"
-                              "    enforce(etc.c.sapnwrfc." ~ memberName ~ "(";
-                string tail = "), errorInfo, file, line);\n}\n";
+                              "    " ~ (hasReturn ? "auto ret = " : "") ~ "etc.c.sapnwrfc." ~ memberName ~ "(";
+                string tail = ");\n    enforce(errorInfo, file, line);\n" ~ (hasReturn ? "    return ret;\n" : "") ~ "}\n";
 
-                bool errorInfoSeen = false;
                 immutable len = ParameterTypeTuple!member.length;
                 foreach(idx, argName; ParameterIdentifierTuple!member)
                 {
                     static if (is(ParameterTypeTuple!member[idx] == RFC_ERROR_INFO))
                     {
-                        errorInfoSeen = true;
                         src ~= "errorInfo";
                     }
                     else
@@ -192,3 +197,19 @@ private string generate()
 
 //pragma(msg, generate());
 mixin(generate());
+
+// Some manual bindings.
+RFC_CONNECTION_HANDLE RfcOpenConnection(in RFC_CONNECTION_PARAMETER[] connectionParams)
+{
+    return RfcOpenConnection(connectionParams.ptr, cast(uint)connectionParams.length);
+}
+
+RFC_CONNECTION_HANDLE RfcRegisterServer(in RFC_CONNECTION_PARAMETER[] connectionParams)
+{
+    return RfcRegisterServer(connectionParams.ptr, cast(uint)connectionParams.length);
+}
+
+RFC_CONNECTION_HANDLE RfcStartServer(int argc, SAP_UC** argv, in RFC_CONNECTION_PARAMETER[] connectionParams)
+{
+    return RfcStartServer(argc, argv, connectionParams.ptr, cast(uint)connectionParams.length);
+}
