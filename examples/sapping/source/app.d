@@ -8,21 +8,7 @@ import std.string;
 import std.typetuple;
 import std.utf;
 
-version(Windows)
-{
-    import core.stdc.wchar_ : wcslen;
-}
-else
-{
-    size_t wcslen(in const(wchar)* s)
-    {
-        const(wchar)* p = s;
-        while (*p) p++;
-        return p - s;
-    }
-}
-
-enum VERSION = "0.2";
+enum VERSION = "0.3";
 
 alias KEYWORDS = TypeTuple!(
     // General Connection parameters
@@ -194,11 +180,10 @@ int run(string[] args)
     RFCSI_EXPORT rfcsiExport;
     foreach(wstring memberName; __traits(allMembers, RFCSI_EXPORT))
     {
-        uint len;
+        size_t len;
         wchar[64] buffer;
-        RfcGetString(rfcsiStructureHandle, memberName.ptr, buffer.ptr, cast(uint) buffer.length, len);
+        RfcGetString(rfcsiStructureHandle, memberName, buffer, len);
         __traits(getMember, rfcsiExport, memberName) = buffer[0..len].dup;
-        //writefln("%s = %s", memberName, __traits(getMember, rfcsiExport, memberName));
     }
 
     auto tzone = to!long(strip(rfcsiExport.RFCTZONE)) / 3600;

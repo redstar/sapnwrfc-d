@@ -213,3 +213,10 @@ RFC_CONNECTION_HANDLE RfcStartServer(int argc, SAP_UC** argv, in RFC_CONNECTION_
 {
     return RfcStartServer(argc, argv, connectionParams.ptr, cast(uint)connectionParams.length);
 }
+
+void RfcGetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer, out size_t length)
+{
+    uint len;
+    RfcGetString(dataHandle, std.utf.toUTF16z(name), buffer.ptr, cast(uint)buffer.length, len);
+    length = len;
+}
