@@ -195,10 +195,11 @@ private string generate()
     return code;
 }
 
-//pragma(msg, generate());
 mixin(generate());
 
 // Some manual bindings.
+// FIXME: Create via reflection.
+
 RFC_CONNECTION_HANDLE RfcOpenConnection(in RFC_CONNECTION_PARAMETER[] connectionParams)
 {
     return RfcOpenConnection(connectionParams.ptr, cast(uint)connectionParams.length);
@@ -214,9 +215,47 @@ RFC_CONNECTION_HANDLE RfcStartServer(int argc, SAP_UC** argv, in RFC_CONNECTION_
     return RfcStartServer(argc, argv, connectionParams.ptr, cast(uint)connectionParams.length);
 }
 
+// Data container getter
+
 void RfcGetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer, out size_t length)
 {
     uint len;
     RfcGetString(dataHandle, std.utf.toUTF16z(name), buffer.ptr, cast(uint)buffer.length, len);
     length = len;
+}
+
+size_t RfcGetStringLength(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
+{
+    uint len;
+    RfcGetStringLength(dataHandle, std.utf.toUTF16z(name), len);
+    return len;
+}
+
+size_t RfcGetStringLengthByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index)
+{
+    uint len;
+    RfcGetStringLengthByIndex(dataHandle, cast(uint)index, len);
+    return len;
+}
+
+// Data container setter
+
+void RfcSetChars(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring value)
+{
+    RfcSetChars(dataHandle, std.utf.toUTF16z(name), value.ptr, cast(uint)value.length);
+}
+
+void RfcSetCharsByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in wstring value)
+{
+    RfcSetCharsByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
+}
+
+void RfcSetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring value)
+{
+    RfcSetString(dataHandle, std.utf.toUTF16z(name), value.ptr, cast(uint)value.length);
+}
+
+void RfcSetStringByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in wstring value)
+{
+    RfcSetStringByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
 }
