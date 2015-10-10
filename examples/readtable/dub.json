@@ -1,9 +1,0 @@
-﻿{
-	"name": "readtable",
-	"description": "Execute RFC_READ_TABLE in SAP system and export result",
-	"copyright": "Copyright (C) 2015, Kai Nacke",
-	"authors": ["Kai Nacke"],
-	"dependencies": {
-		"sapnwrfc-d": { "version": "~master", "path": "../../" }
-	}
-}
