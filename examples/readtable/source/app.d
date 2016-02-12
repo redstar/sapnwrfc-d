@@ -14,7 +14,10 @@ alias KEYWORDS = TypeTuple!(
     // General Connection parameters
     "DEST",
     "TABLE",
+    "FIELDS",
+    "OPTIONS",
     "DELIMITER",
+    "NODATA",
     "MAXROWS",
 );
 
@@ -37,6 +40,7 @@ void usage(int rc = 1)
     writefln("\nOptions:");
     writefln("    -h    This help text");
     writefln("    -v    Enable verbose output");
+    writefln("    -a    Use BBP_RFC_READ_TABLE instead of RFC_READ_TABLE");
     writefln("\nRecognized keys:");
     short col = 0;
     foreach (key; KEYWORDS)
@@ -54,42 +58,27 @@ void usage(int rc = 1)
 
 alias cU = toUTF16z;
 
-struct RFCSI_EXPORT
-{
-    wchar[/*3*/] RFCPROTO;
-    wchar[/*4*/] RFCCHARTYP;
-    wchar[/*3*/] RFCINTTYP;
-    wchar[/*3*/] RFCFLOTYP;
-    wchar[/*32*/] RFCDEST;
-    wchar[/*8*/] RFCHOST;
-    wchar[/*8*/] RFCSYSID;
-    wchar[/*8*/] RFCDATABS;
-    wchar[/*32*/] RFCDBHOST;
-    wchar[/*10*/] RFCDBSYS;
-    wchar[/*4*/] RFCSAPRL;
-    wchar[/*5*/] RFCMACH;
-    wchar[/*10*/] RFCOPSYS;
-    wchar[/*6*/] RFCTZONE;
-    wchar[/*1*/] RFCDAYST;
-    wchar[/*15*/] RFCIPADDR;
-    wchar[/*4*/] RFCKERNRL;
-    wchar[/*32*/] RFCHOST2;
-    wchar[/*12*/] RFCSI_RESV;
-    wchar[/*45*/] RFCIPV6ADDR;
-}
-
 int run(string[] args)
 {
     if  (args.length == 0) usage();
 
     bool verbose = false;
+    wstring rfcfunc = "RFC_READ_TABLE";
     wstring dest = "";
     wstring table = "";
+    wstring fields = "";
+    wstring options = "";
     wstring delimiter = "";
+    wstring nodata = "";
     wstring maxrows = "";
 
     foreach(arg; args[1..$])
     {
+        if (arg == "-a")
+        {
+            rfcfunc = "BBP_RFC_READ_TABLE";
+            continue;
+        }
         if (arg == "-v")
         {
             verbose = true;
@@ -114,31 +103,56 @@ int run(string[] args)
         usage();
 
     if (verbose) writeln("Connecting...");
+    RfcInit();
     RFC_CONNECTION_PARAMETER[1] conParams = [ { cU("DEST"), cU(dest) } ];
     auto connection = RfcOpenConnection(conParams);
     scope(exit) RfcCloseConnection(connection);
 
     if (verbose) writeln("Calling read table...");
-    auto desc = RfcGetFunctionDesc(connection, cU("RFC_TABLE_READ"));
+    auto desc = RfcGetFunctionDesc(connection, cU(rfcfunc));
     auto func = RfcCreateFunction(desc);
     scope(exit) RfcDestroyFunction(func);
     RfcSetString(func, "QUERY_TABLE"w, table);
-    if (delimiter != "") RfcSetString(func, "DELIMITER"w, delimiter);
+    RfcSetString(func, "NO_DATA"w, nodata != "" ? nodata : " "w);
+    RfcSetString(func, "DELIMITER"w, delimiter != "" ? delimiter : " "w);
     if (maxrows != "") RfcSetString(func, "ROWCOUNT"w, maxrows);
-    
+    if (fields != "")
+    {
+        auto allFields = std.string.split(fields, ",");
+        RFC_TABLE_HANDLE fieldsTableHandle;
+        RfcGetTable(func, cU("FIELDS"), fieldsTableHandle);
+        foreach (f; allFields)
+        {
+            RfcAppendNewRow(fieldsTableHandle);
+            RfcSetString(fieldsTableHandle, "FIELDNAME"w, f);
+        }
+    }
+    if (options != "")
+    {
+        RFC_TABLE_HANDLE optionsTableHandle;
+        RfcGetTable(func, cU("FIELDS"), optionsTableHandle);
+        RfcAppendNewRow(optionsTableHandle);
+        RfcSetString(optionsTableHandle, "TEXT"w, options);
+    }
+
     RfcInvoke(connection, func);
 
     if (verbose) writeln("Retrieving result data...");
-    RFC_STRUCTURE_HANDLE rfcsiStructureHandle;
-    RfcGetStructure(func, cU("RFCSI_EXPORT"), rfcsiStructureHandle);
+    RFC_TABLE_HANDLE dataTableHandle;
+    RfcGetTable(func, cU("DATA"), dataTableHandle);
     if (verbose) writeln("Copying result data...");
-    RFCSI_EXPORT rfcsiExport;
-    foreach(wstring memberName; __traits(allMembers, RFCSI_EXPORT))
+    uint rows;
+    RfcGetRowCount(dataTableHandle, rows);
+    if (verbose) writefln("Got %d result rows", rows);
+    RfcMoveToFirstRow(dataTableHandle);
+    while (rows > 0)
     {
-        uint len;
-        wchar[64] buffer;
-        RfcGetString(rfcsiStructureHandle, memberName.ptr, buffer.ptr, cast(uint) buffer.length, len);
-        __traits(getMember, rfcsiExport, memberName) = buffer[0..len].dup;
+        size_t len;
+        wchar[512] buffer;
+        RfcGetStringByIndex(dataTableHandle, 0, buffer, len);
+				writeln(buffer[0..len]);
+				if (--rows > 0)
+            RfcMoveToNextRow(dataTableHandle);
     }
 
     return 0;
