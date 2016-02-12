@@ -217,10 +217,47 @@ RFC_CONNECTION_HANDLE RfcStartServer(int argc, SAP_UC** argv, in RFC_CONNECTION_
 
 // Data container getter
 
+void RfcGetChars(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer)
+{
+    RfcGetChars(dataHandle, std.utf.toUTF16z(name), buffer.ptr, cast(uint)buffer.length);
+}
+
+void RfcGetCharsByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, wchar[] buffer)
+{
+    RfcGetCharsByIndex(dataHandle, cast(uint)idx, buffer.ptr, cast(uint)buffer.length);
+}
+
+void RfcGetNum(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer)
+{
+    RfcGetNum(dataHandle, std.utf.toUTF16z(name), buffer.ptr, cast(uint)buffer.length);
+}
+
+void RfcGetNumByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, wchar[] buffer)
+{
+    RfcGetNumByIndex(dataHandle, cast(uint)idx, buffer.ptr, cast(uint)buffer.length);
+}
+
+void RfcGetBytes(DATA_CONTAINER_HANDLE dataHandle, in wstring name, ubyte[] buffer)
+{
+    RfcGetBytes(dataHandle, std.utf.toUTF16z(name), buffer.ptr, cast(uint)buffer.length);
+}
+
+void RfcGetBytesByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, ubyte[] buffer)
+{
+    RfcGetBytesByIndex(dataHandle, cast(uint)idx, buffer.ptr, cast(uint)buffer.length);
+}
+
 void RfcGetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer, out size_t length)
 {
     uint len;
     RfcGetString(dataHandle, std.utf.toUTF16z(name), buffer.ptr, cast(uint)buffer.length, len);
+    length = len;
+}
+
+void RfcGetStringByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, wchar[] buffer, out size_t length)
+{
+    uint len;
+    RfcGetStringByIndex(dataHandle, cast(uint) idx, buffer.ptr, cast(uint)buffer.length, len);
     length = len;
 }
 
@@ -238,6 +275,76 @@ size_t RfcGetStringLengthByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index)
     return len;
 }
 
+void RfcGetInt(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out int value)
+{
+    RfcGetInt(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetIntByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out int value)
+{
+    RfcGetIntByIndex(dataHandle, cast(uint)idx, value);
+}
+
+void RfcGetInt1(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out ubyte value)
+{
+    RfcGetInt1(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetInt1ByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out ubyte value)
+{
+    RfcGetInt1ByIndex(dataHandle, cast(uint)idx, value);
+}
+
+void RfcGetInt2(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out short value)
+{
+    RfcGetInt2(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetInt2ByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out short value)
+{
+    RfcGetInt2ByIndex(dataHandle, cast(uint)idx, value);
+}
+
+void RfcGetFloat(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out double value)
+{
+    RfcGetFloat(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetFloatByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out double value)
+{
+    RfcGetFloatByIndex(dataHandle, cast(uint)idx, value);
+}
+
+void RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_STRUCTURE_HANDLE value)
+{
+    RfcGetStructure(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetStructureByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out RFC_STRUCTURE_HANDLE value)
+{
+    RfcGetStructureByIndex(dataHandle, cast(uint)idx, value);
+}
+
+void RfcGetTable(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_TABLE_HANDLE value)
+{
+    RfcGetTable(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetTableByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out RFC_TABLE_HANDLE value)
+{
+    RfcGetTableByIndex(dataHandle, cast(uint)idx, value);
+}
+
+void RfcGetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_ABAP_OBJECT_HANDLE value)
+{
+    RfcGetAbapObject(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcGetAbapObjectByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out RFC_ABAP_OBJECT_HANDLE value)
+{
+    RfcGetAbapObjectByIndex(dataHandle, cast(uint)idx, value);
+}
+
 // Data container setter
 
 void RfcSetChars(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring value)
@@ -250,6 +357,26 @@ void RfcSetCharsByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in wstri
     RfcSetCharsByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
 }
 
+void RfcSetNum(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring value)
+{
+    RfcSetNum(dataHandle, std.utf.toUTF16z(name), value.ptr, cast(uint)value.length);
+}
+
+void RfcSetNumByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in wstring value)
+{
+    RfcSetNumByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
+}
+
+void RfcSetBytes(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in ubyte[] value)
+{
+    RfcSetBytes(dataHandle, std.utf.toUTF16z(name), value.ptr, cast(uint)value.length);
+}
+
+void RfcSetBytesByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in ubyte[] value)
+{
+    RfcSetBytesByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
+}
+
 void RfcSetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring value)
 {
     RfcSetString(dataHandle, std.utf.toUTF16z(name), value.ptr, cast(uint)value.length);
@@ -258,4 +385,74 @@ void RfcSetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring 
 void RfcSetStringByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in wstring value)
 {
     RfcSetStringByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
+}
+
+void RfcSetInt(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in int value)
+{
+    RfcSetInt(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetIntByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in int value)
+{
+    RfcSetIntByIndex(dataHandle, cast(uint)index, value);
+}
+
+void RfcSetInt1(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in ubyte value)
+{
+    RfcSetInt1(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetInt1ByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in ubyte value)
+{
+    RfcSetInt1ByIndex(dataHandle, cast(uint)index, value);
+}
+
+void RfcSetInt2(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in short value)
+{
+    RfcSetInt2(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetInt2ByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in short value)
+{
+    RfcSetInt2ByIndex(dataHandle, cast(uint)index, value);
+}
+
+void RfcSetFloat(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in double value)
+{
+    RfcSetFloat(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetFloatByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in double value)
+{
+    RfcSetFloatByIndex(dataHandle, cast(uint)index, value);
+}
+
+void RfcSetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in RFC_STRUCTURE_HANDLE value)
+{
+    RfcSetStructure(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetStructureByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in RFC_STRUCTURE_HANDLE value)
+{
+    RfcSetStructureByIndex(dataHandle, cast(uint)index, value);
+}
+
+void RfcSetTable(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in RFC_TABLE_HANDLE value)
+{
+    RfcSetTable(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetTableByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in RFC_TABLE_HANDLE value)
+{
+    RfcSetTableByIndex(dataHandle, cast(uint)index, value);
+}
+
+void RfcSetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in RFC_ABAP_OBJECT_HANDLE value)
+{
+    RfcSetAbapObject(dataHandle, std.utf.toUTF16z(name), value);
+}
+
+void RfcSetAbapObjectByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in RFC_ABAP_OBJECT_HANDLE value)
+{
+    RfcSetAbapObjectByIndex(dataHandle, cast(uint)index, value);
 }
