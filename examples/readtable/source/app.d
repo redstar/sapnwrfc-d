@@ -32,15 +32,31 @@ class ExitException : Exception
     }
 }
 
+string[] firstSplitOf(string s, char delim)
+{
+    auto idx = s.indexOf(delim);
+    if (idx < 0)
+    {
+        auto res = new string[1];
+        res[0] = s;
+        return res;
+    }
+    auto res = new string[2];
+    res[0] = s[0..idx];
+    res[1] = s[idx+1..$];
+    return res;
+}
+
 void usage(int rc = 1)
 {
     writefln("ReadTable V%s", VERSION);
     writefln("\nUsage:");
     writefln("    readtable [-h] [-v] (KEY=VALUE)+");
     writefln("\nOptions:");
-    writefln("    -h    This help text");
-    writefln("    -v    Enable verbose output");
-    writefln("    -a    Use BBP_RFC_READ_TABLE instead of RFC_READ_TABLE");
+    writefln("    -h       This help text");
+    writefln("    -v       Enable verbose output");
+    writefln("    -a       Use BBP_RFC_READ_TABLE instead of RFC_READ_TABLE");
+    writefln("    -a=name  Use RFC name instead of RFC_READ_TABLE");
     writefln("\nRecognized keys:");
     short col = 0;
     foreach (key; KEYWORDS)
@@ -52,7 +68,7 @@ void usage(int rc = 1)
     }
     writeln();
     writefln("\nExample:");
-    writefln("    readtable DEST=X01 TABLE=bd90 DELIMITER=| MAXROWS=500");
+    writefln("    readtable DEST=X01 TABLE=TSTC DELIMITER=| MAXROWS=500 OPTIONS=\"TCODE LIKE 'SE%%'\"");
     throw new ExitException(rc);
 }
 
@@ -63,7 +79,7 @@ int run(string[] args)
     if  (args.length == 0) usage();
 
     bool verbose = false;
-    wstring rfcfunc = "RFC_READ_TABLE";
+    string rfcfunc = "RFC_READ_TABLE";
     wstring dest = "";
     wstring table = "";
     wstring fields = "";
@@ -74,9 +90,18 @@ int run(string[] args)
 
     foreach(arg; args[1..$])
     {
-        if (arg == "-a")
+        if (arg.startsWith("-a"))
         {
-            rfcfunc = "BBP_RFC_READ_TABLE";
+            if (arg == "-a")
+            {    
+                rfcfunc = "BBP_RFC_READ_TABLE";
+            }
+            else if (arg.startsWith("-a=") && arg.length > 3)
+            {
+                rfcfunc = arg[3..$];
+            }
+            else
+                usage(0);
             continue;
         }
         if (arg == "-v")
@@ -86,7 +111,7 @@ int run(string[] args)
         }
         if (arg == "-h")
             usage(0);
-        auto kv = split(arg, "=");
+        auto kv = firstSplitOf(arg, '=');
         if (kv.length != 2) usage();
 
         switch (kv[0])
@@ -129,8 +154,10 @@ int run(string[] args)
     }
     if (options != "")
     {
+        // FIXME: TEXT field is only up to 72 chars.
+        //        Split line and append new row if longer
         RFC_TABLE_HANDLE optionsTableHandle;
-        RfcGetTable(func, cU("FIELDS"), optionsTableHandle);
+        RfcGetTable(func, cU("OPTIONS"), optionsTableHandle);
         RfcAppendNewRow(optionsTableHandle);
         RfcSetString(optionsTableHandle, "TEXT"w, options);
     }
