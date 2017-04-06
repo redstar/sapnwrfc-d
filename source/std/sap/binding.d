@@ -132,8 +132,8 @@ private string generate()
             {
                 bool hasReturn = !is(ReturnType!member == void) && !is(ReturnType!member == RFC_RC);
                 string head = (hasReturn ? ReturnType!member.stringof : "void") ~ " " ~ memberName ~ "(";
-                string src = "string file = __FILE__, size_t line = __LINE__) {\n"
-                              "    RFC_ERROR_INFO errorInfo;\n"
+                string src = "string file = __FILE__, size_t line = __LINE__) {\n" ~
+                              "    RFC_ERROR_INFO errorInfo;\n" ~
                               "    " ~ (hasReturn ? "auto ret = " : "") ~ "etc.c.sapnwrfc." ~ memberName ~ "(";
                 string tail = ");\n    enforce(errorInfo, file, line);\n" ~ (hasReturn ? "    return ret;\n" : "") ~ "}\n";
 
