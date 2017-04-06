@@ -8,7 +8,7 @@ import std.string;
 import std.typetuple;
 import std.utf;
 
-enum VERSION = "0.1";
+enum VERSION = "0.2";
 
 alias KEYWORDS = TypeTuple!(
     // General Connection parameters
@@ -51,7 +51,7 @@ void usage(int rc = 1)
 {
     writefln("ReadTable V%s", VERSION);
     writefln("\nUsage:");
-    writefln("    readtable [-h] [-v] (KEY=VALUE)+");
+    writefln("    readtable [-h] [-v] [-a[=name]] (KEY=VALUE)+");
     writefln("\nOptions:");
     writefln("    -h       This help text");
     writefln("    -v       Enable verbose output");
