@@ -6,6 +6,7 @@ import etc.c.sapnwrfc;
 
 import std.traits;
 import std.conv : to;
+static import std.utf;
 
 version(Windows)
 {
