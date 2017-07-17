@@ -49,7 +49,6 @@ The use of module `std.sap` should be preferred because of the much easier error
 Limitations
 -----------
 
-- Currently there are no bindings for the decimal data types `DecFloat16` and `DecFloat34`.
 - The prototypes are still reworked to use `out` and other type modifiers.
 - A high level API is missing. Ideas include:
   - The C style string handling should be replaced with D strings
