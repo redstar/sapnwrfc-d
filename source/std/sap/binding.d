@@ -457,3 +457,25 @@ void RfcSetAbapObjectByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in 
 {
     RfcSetAbapObjectByIndex(dataHandle, cast(uint)index, value);
 }
+
+// Metadata API
+size_t RfcGetExceptionCount(RFC_FUNCTION_DESC_HANDLE handle)
+{
+    uint count;
+    RfcGetExceptionCount(handle, count);
+    return count;
+}
+
+size_t RfcGetFieldCount(RFC_TYPE_DESC_HANDLE handle)
+{
+    uint count;
+    RfcGetFieldCount(handle, count);
+    return count;
+}
+
+size_t RfcGetParameterCount(RFC_FUNCTION_DESC_HANDLE handle)
+{
+    uint count;
+    RfcGetParameterCount(handle, count);
+    return count;
+}
