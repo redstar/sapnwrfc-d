@@ -1,0 +1,6 @@
+name "repotool"
+description "Search for and display SAP repository information"
+copyright "Copyright (C) 2017, Kai Nacke"
+authors "Kai Nacke"
+dependency "sapnwrfc-d" version="~master" path="../../"
+

@@ -34,7 +34,8 @@ Examples
 Examples are provided in the `examples` [folder](https://github.com/redstar/sapnwrfc-d/tree/master/examples/).
 
 - sapping connects to a SAP system and retrieves some system information. Useful for connection tests.
-- readtable (WIP) calls RFC_READ_TABLE and exports the content of a database table.
+- readtable calls RFC_READ_TABLE and exports the content of a database table.
+- repotool (WIP) displays the metadata for a function
 
 Functionality
 -------------
