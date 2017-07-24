@@ -7,7 +7,20 @@ import std.stdio;
 import std.string;
 import std.typetuple;
 import std.utf;
-import core.stdc.wchar_ : wcslen;
+
+version(Windows)
+{
+    import core.stdc.wchar_ : wcslen;
+}
+else
+{
+    private size_t wcslen(in const(wchar)* s)
+    {
+        const(wchar)* p = s;
+        while (*p) p++;
+        return p - s;
+    }
+}
 
 enum VERSION = "0.1";
 
@@ -115,11 +128,73 @@ void dumpStructureOrTable(RFC_TYPE_DESC_HANDLE typeDescHandle)
     }
 }
 
+void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
+{
+    RFC_ABAP_NAME name;
+    RfcGetFunctionName(funcDesc, name);
+    writefln("FUNCTION\n    %s\n", name[0..wcslen(name.ptr)]);
+
+    immutable paramCount = RfcGetParameterCount(funcDesc);
+    alias DIRECTION = TypeTuple!(
+        RFC_DIRECTION.RFC_IMPORT,
+        RFC_DIRECTION.RFC_EXPORT,
+        RFC_DIRECTION.RFC_CHANGING,
+        RFC_DIRECTION.RFC_TABLES,
+    );
+    foreach (direction; DIRECTION)
+    {
+        static if (direction == RFC_DIRECTION.RFC_IMPORT)
+            writeln("IMPORTING");
+        else static if (direction == RFC_DIRECTION.RFC_EXPORT)
+            writeln("EXPORTING");
+        else static if (direction == RFC_DIRECTION.RFC_CHANGING)
+            writeln("CHANGING");
+        else static if (direction == RFC_DIRECTION.RFC_TABLES)
+            writeln("TABLES");
+
+        foreach (i; 0..paramCount)
+        {
+            RFC_PARAMETER_DESC paramDesc;
+            RfcGetParameterDescByIndex(funcDesc, cast(uint)i, paramDesc);
+            if (paramDesc.direction != direction)
+                continue;
+            writef("    %s ", paramDesc.name[0..wcslen(paramDesc.name.ptr)]);
+            auto typestr = RfcGetTypeAsString(paramDesc.type);
+            writef("%s ", typestr[0..wcslen(typestr)]);
+            switch (paramDesc.type)
+            {
+                case RFCTYPE.RFCTYPE_CHAR:
+                case RFCTYPE.RFCTYPE_NUM:
+                    if (paramDesc.nucLength != 1)
+                        writef("Length %d ", paramDesc.nucLength);
+                    break;
+                case RFCTYPE.RFCTYPE_BYTE:
+                case RFCTYPE.RFCTYPE_INT:
+                case RFCTYPE.RFCTYPE_INT2:
+                case RFCTYPE.RFCTYPE_INT1:
+                    if (paramDesc.ucLength != 1)
+                        writef("Length %d ", paramDesc.ucLength);
+                    break;
+                default:
+                    break;
+            }
+            writeln();
+        }
+        writeln("\n");
+    }
+}
+
+void dumpMetadataAsD(RFC_FUNCTION_DESC_HANDLE funcDesc)
+{
+    writeln("Not yet implemented");
+}
+
 int run(string[] args)
 {
     if  (args.length == 0) usage();
 
     bool verbose = false;
+    bool outputD = false;
     wstring dest = "";
     wstring func = "";
 
@@ -137,7 +212,15 @@ int run(string[] args)
 
         switch (kv[0])
         {
-            default: usage();
+            default:
+                usage();
+                break;
+            case "-lang":
+                if (kv[1] == "d")
+                    outputD = true;
+                else
+                    usage();
+                break;
             foreach (key; KEYWORDS)
             {
                 case key: mixin(toLower(key)) = toUTF16(kv[1]); break;
@@ -156,68 +239,11 @@ int run(string[] args)
 
     if (verbose) writeln("Retrieving function description...");
     auto desc = RfcGetFunctionDesc(connection, cU(func));
-    
-    immutable paramCount = RfcGetParameterCount(desc);
-    foreach (i; 0..paramCount)
-    {
-        RFC_PARAMETER_DESC paraDesc;
-        RfcGetParameterDescByIndex(desc, cast(uint)i, paraDesc);
-        writef("%s ", paraDesc.name[0..wcslen(paraDesc.name.ptr)]);
-        final switch (paraDesc.direction)
-        {
-            case RFC_DIRECTION.RFC_IMPORT:
-                writef("import ");
-                break;
-            case RFC_DIRECTION.RFC_EXPORT:
-                writef("export ");
-                break;
-            case RFC_DIRECTION.RFC_CHANGING:
-                writef("changing ");
-                break;
-            case RFC_DIRECTION.RFC_TABLES:
-                writef("table ");
-                break;
-        }
-        switch (paraDesc.type)
-        {
-            case RFCTYPE.RFCTYPE_CHAR:
-                writef("CHAR[%d] ", paraDesc.nucLength);
-                break;
-            case RFCTYPE.RFCTYPE_DATE:
-                writef("DATE ");
-                break;
-            case RFCTYPE.RFCTYPE_BCD:
-                writef("BCD ");
-                break;
-            case RFCTYPE.RFCTYPE_TIME:
-                writef("TIME ");
-                break;
-            case RFCTYPE.RFCTYPE_BYTE:
-                writef("BYTE[%d] ", paraDesc.ucLength);
-                break;
-            case RFCTYPE.RFCTYPE_INT:
-                writef("INT[%d] ", paraDesc.ucLength);
-                break;
-            case RFCTYPE.RFCTYPE_INT2:
-                writef("SHORT[%d] ", paraDesc.ucLength);
-                break;
-            case RFCTYPE.RFCTYPE_INT1:
-                writef("BYTE[%d] ", paraDesc.ucLength);
-                break;
-            case RFCTYPE.RFCTYPE_TABLE:
-                writefln("TABLE ");
-                dumpStructureOrTable(paraDesc.typeDescHandle);
-                break;
-            case RFCTYPE.RFCTYPE_STRUCTURE:
-                writefln("STRUCTURE ");
-                dumpStructureOrTable(paraDesc.typeDescHandle);
-                break;
-            default:
-                writef("%d ", paraDesc.type);
-        }
-        writeln();
-    }
 
+    if (outputD)
+        dumpMetadataAsD(desc);
+    else
+        dumpMetadata(desc);
 
     return 0;
 }
