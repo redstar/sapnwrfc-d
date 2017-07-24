@@ -36,6 +36,7 @@ Examples are provided in the `examples` [folder](https://github.com/redstar/sapn
 - sapping connects to a SAP system and retrieves some system information. Useful for connection tests.
 - readtable calls RFC_READ_TABLE and exports the content of a database table.
 - repotool (WIP) displays the metadata for a function
+- (Idea: tool to execute arbitrary function by reading parameters in JSON format from stdio and outputing result as JSON to stdout) 
 
 Functionality
 -------------
