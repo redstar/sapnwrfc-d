@@ -6,6 +6,7 @@ import etc.c.sapnwrfc;
 
 import std.traits;
 import std.conv : to;
+import std.algorithm : endsWith, startsWith;
 static import std.utf;
 
 version(Windows)
@@ -189,6 +190,20 @@ private string generate()
                 }
 
                 if (errorInfoSeen) code ~= head ~ src ~ tail;
+            }
+
+            // Special bindings for Rfc*Count functions
+            static if (is(ReturnType!member == RFC_RC) && ParameterTypeTuple!member.length == 3
+                && memberName.startsWith("RfcGet") && memberName.endsWith("Count")
+                && is(ParameterTypeTuple!member[1] == uint) && ParameterStorageClassTuple!member[1] == STC.out_
+                && is(ParameterTypeTuple!member[2] == RFC_ERROR_INFO)
+                )
+            {
+                string src = "size_t " ~ memberName ~ "(";
+                src ~= ParameterTypeTuple!member[0].stringof;
+                src ~= " handle)\n";
+                src ~= "{ uint count; " ~ memberName ~ "(handle, count); return count; }\n";
+                code ~= src;
             }
         }
     }
@@ -456,26 +471,4 @@ void RfcSetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in RFC_
 void RfcSetAbapObjectByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in RFC_ABAP_OBJECT_HANDLE value)
 {
     RfcSetAbapObjectByIndex(dataHandle, cast(uint)index, value);
-}
-
-// Metadata API
-size_t RfcGetExceptionCount(RFC_FUNCTION_DESC_HANDLE handle)
-{
-    uint count;
-    RfcGetExceptionCount(handle, count);
-    return count;
-}
-
-size_t RfcGetFieldCount(RFC_TYPE_DESC_HANDLE handle)
-{
-    uint count;
-    RfcGetFieldCount(handle, count);
-    return count;
-}
-
-size_t RfcGetParameterCount(RFC_FUNCTION_DESC_HANDLE handle)
-{
-    uint count;
-    RfcGetParameterCount(handle, count);
-    return count;
 }
