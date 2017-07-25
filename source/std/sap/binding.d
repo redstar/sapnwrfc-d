@@ -192,7 +192,7 @@ private string generate()
                 if (errorInfoSeen) code ~= head ~ src ~ tail;
             }
 
-            // Special bindings for Rfc*Count functions
+            // Special bindings for RfcGet*Count functions
             static if (is(ReturnType!member == RFC_RC) && ParameterTypeTuple!member.length == 3
                 && memberName.startsWith("RfcGet") && memberName.endsWith("Count")
                 && is(ParameterTypeTuple!member[1] == uint) && ParameterStorageClassTuple!member[1] == STC.out_
@@ -203,6 +203,23 @@ private string generate()
                 src ~= ParameterTypeTuple!member[0].stringof;
                 src ~= " handle)\n";
                 src ~= "{ uint count; " ~ memberName ~ "(handle, count); return count; }\n";
+                code ~= src;
+            }
+
+
+            // Special bindings for RfcGet*ByIndex functions
+            static if (is(ReturnType!member == RFC_RC) && ParameterTypeTuple!member.length == 4
+                && memberName.startsWith("RfcGet") && memberName.endsWith("ByIndex")
+                && is(ParameterTypeTuple!member[1] == uint) && ParameterStorageClassTuple!member[2] == STC.out_
+                && is(ParameterTypeTuple!member[3] == RFC_ERROR_INFO)
+                )
+            {
+                string src = "void " ~ memberName ~ "(";
+                src ~= ParameterTypeTuple!member[0].stringof;
+                src ~= " handle, size_t idx, out ";
+                src ~= ParameterTypeTuple!member[2].stringof;
+                src ~= " value)\n";
+                src ~= "{ " ~ memberName ~ "(handle, cast(uint) idx, value); }\n";
                 code ~= src;
             }
         }
@@ -296,19 +313,9 @@ void RfcGetInt(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out int value)
     RfcGetInt(dataHandle, std.utf.toUTF16z(name), value);
 }
 
-void RfcGetIntByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out int value)
-{
-    RfcGetIntByIndex(dataHandle, cast(uint)idx, value);
-}
-
 void RfcGetInt1(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out ubyte value)
 {
     RfcGetInt1(dataHandle, std.utf.toUTF16z(name), value);
-}
-
-void RfcGetInt1ByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out ubyte value)
-{
-    RfcGetInt1ByIndex(dataHandle, cast(uint)idx, value);
 }
 
 void RfcGetInt2(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out short value)
@@ -316,19 +323,9 @@ void RfcGetInt2(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out short val
     RfcGetInt2(dataHandle, std.utf.toUTF16z(name), value);
 }
 
-void RfcGetInt2ByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out short value)
-{
-    RfcGetInt2ByIndex(dataHandle, cast(uint)idx, value);
-}
-
 void RfcGetFloat(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out double value)
 {
     RfcGetFloat(dataHandle, std.utf.toUTF16z(name), value);
-}
-
-void RfcGetFloatByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out double value)
-{
-    RfcGetFloatByIndex(dataHandle, cast(uint)idx, value);
 }
 
 void RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_STRUCTURE_HANDLE value)
@@ -336,29 +333,14 @@ void RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_
     RfcGetStructure(dataHandle, std.utf.toUTF16z(name), value);
 }
 
-void RfcGetStructureByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out RFC_STRUCTURE_HANDLE value)
-{
-    RfcGetStructureByIndex(dataHandle, cast(uint)idx, value);
-}
-
 void RfcGetTable(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_TABLE_HANDLE value)
 {
     RfcGetTable(dataHandle, std.utf.toUTF16z(name), value);
 }
 
-void RfcGetTableByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out RFC_TABLE_HANDLE value)
-{
-    RfcGetTableByIndex(dataHandle, cast(uint)idx, value);
-}
-
 void RfcGetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_ABAP_OBJECT_HANDLE value)
 {
     RfcGetAbapObject(dataHandle, std.utf.toUTF16z(name), value);
-}
-
-void RfcGetAbapObjectByIndex(DATA_CONTAINER_HANDLE dataHandle, in size_t idx, out RFC_ABAP_OBJECT_HANDLE value)
-{
-    RfcGetAbapObjectByIndex(dataHandle, cast(uint)idx, value);
 }
 
 // Data container setter
