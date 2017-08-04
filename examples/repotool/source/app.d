@@ -87,7 +87,7 @@ void dumpStructureOrTable(RFC_TYPE_DESC_HANDLE typeDescHandle)
     foreach (i; 0..fieldCount)
     {
         RFC_FIELD_DESC fieldDesc;
-        RfcGetFieldDescByIndex(typeDescHandle, cast(uint)i, fieldDesc);
+        RfcGetFieldDescByIndex(typeDescHandle, i, fieldDesc);
         writef("    %s ", fieldDesc.name[0..wcslen(fieldDesc.name.ptr)]);
         switch (fieldDesc.type)
         {
@@ -155,12 +155,12 @@ void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
         foreach (i; 0..paramCount)
         {
             RFC_PARAMETER_DESC paramDesc;
-            RfcGetParameterDescByIndex(funcDesc, cast(uint)i, paramDesc);
+            RfcGetParameterDescByIndex(funcDesc, i, paramDesc);
             if (paramDesc.direction != direction)
                 continue;
-            writef("    %s ", paramDesc.name[0..wcslen(paramDesc.name.ptr)]);
+            writef("    %-30s ", paramDesc.name[0..wcslen(paramDesc.name.ptr)]);
             auto typestr = RfcGetTypeAsString(paramDesc.type);
-            writef("%s ", typestr[0..wcslen(typestr)]);
+            writef("%-10s ", typestr[0..wcslen(typestr)]);
             switch (paramDesc.type)
             {
                 case RFCTYPE.RFCTYPE_CHAR:
@@ -181,6 +181,14 @@ void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
             writeln();
         }
         writeln("\n");
+    }
+    writeln("EXCEPTIONS");
+    immutable excCount = RfcGetExceptionCount(funcDesc);
+    foreach (i; 0..excCount)
+    {
+        RFC_EXCEPTION_DESC excDesc;
+        RfcGetExceptionDescByIndex(funcDesc, i, excDesc);
+        writeln("    %s", excDesc.key[0..wcslen(excDesc.key.ptr)]);
     }
 }
 
