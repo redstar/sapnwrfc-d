@@ -81,14 +81,16 @@ void usage(int rc = 1)
 
 alias cU = toUTF16z;
 
-void dumpStructureOrTable(RFC_TYPE_DESC_HANDLE typeDescHandle)
+void dumpStructureOrTable(RFC_TYPE_DESC_HANDLE typeDescHandle, int level = 1)
 {
     immutable fieldCount = RfcGetFieldCount(typeDescHandle);
     foreach (i; 0..fieldCount)
     {
         RFC_FIELD_DESC fieldDesc;
         RfcGetFieldDescByIndex(typeDescHandle, i, fieldDesc);
-        writef("    %s ", fieldDesc.name[0..wcslen(fieldDesc.name.ptr)]);
+        foreach (j; 0..level)
+            write("    ");
+        writef("%s ", fieldDesc.name[0..wcslen(fieldDesc.name.ptr)]);
         switch (fieldDesc.type)
         {
             case RFCTYPE.RFCTYPE_CHAR:
@@ -117,9 +119,13 @@ void dumpStructureOrTable(RFC_TYPE_DESC_HANDLE typeDescHandle)
                 break;
             case RFCTYPE.RFCTYPE_TABLE:
                 writef("TABLE ");
+                writeln();
+                dumpStructureOrTable(fieldDesc.typeDescHandle, level+1);
                 break;
             case RFCTYPE.RFCTYPE_STRUCTURE:
                 writef("STRUCTURE ");
+                writeln();
+                dumpStructureOrTable(fieldDesc.typeDescHandle, level+1);
                 break;
             default:
                 writef("%d ", fieldDesc.type);
