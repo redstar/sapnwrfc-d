@@ -129,7 +129,7 @@ int run(string[] args)
 
     if (verbose) writeln("Connecting...");
     RfcInit();
-    RFC_CONNECTION_PARAMETER[1] conParams = [ { cU("DEST"), cU(dest) } ];
+    RFC_CONNECTION_PARAMETER[1] conParams = [ { "DEST"w.ptr, cU(dest) } ];
     auto connection = RfcOpenConnection(conParams);
     scope(exit) RfcCloseConnection(connection);
 
@@ -145,7 +145,7 @@ int run(string[] args)
     {
         auto allFields = std.string.split(fields, ",");
         RFC_TABLE_HANDLE fieldsTableHandle;
-        RfcGetTable(func, cU("FIELDS"), fieldsTableHandle);
+        RfcGetTable(func, "FIELDS"w, fieldsTableHandle);
         foreach (f; allFields)
         {
             RfcAppendNewRow(fieldsTableHandle);
@@ -157,7 +157,7 @@ int run(string[] args)
         // FIXME: TEXT field is only up to 72 chars.
         //        Split line and append new row if longer
         RFC_TABLE_HANDLE optionsTableHandle;
-        RfcGetTable(func, cU("OPTIONS"), optionsTableHandle);
+        RfcGetTable(func, "OPTIONS"w, optionsTableHandle);
         RfcAppendNewRow(optionsTableHandle);
         RfcSetString(optionsTableHandle, "TEXT"w, options);
     }
@@ -166,7 +166,7 @@ int run(string[] args)
 
     if (verbose) writeln("Retrieving result data...");
     RFC_TABLE_HANDLE dataTableHandle;
-    RfcGetTable(func, cU("DATA"), dataTableHandle);
+    RfcGetTable(func, "DATA"w, dataTableHandle);
     if (verbose) writeln("Copying result data...");
     uint rows;
     RfcGetRowCount(dataTableHandle, rows);

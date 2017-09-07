@@ -168,14 +168,14 @@ int run(string[] args)
     RfcPing(connection);
 
     if (verbose) writeln("Calling system info...");
-    auto desc = RfcGetFunctionDesc(connection, cU("RFC_SYSTEM_INFO"));
+    auto desc = RfcGetFunctionDesc(connection, "RFC_SYSTEM_INFO"w.ptr);
     auto func = RfcCreateFunction(desc);
     scope(exit) RfcDestroyFunction(func);
     RfcInvoke(connection, func);
 
     if (verbose) writeln("Retrieving result data...");
     RFC_STRUCTURE_HANDLE rfcsiStructureHandle;
-    RfcGetStructure(func, cU("RFCSI_EXPORT"), rfcsiStructureHandle);
+    RfcGetStructure(func, "RFCSI_EXPORT"w, rfcsiStructureHandle);
     if (verbose) writeln("Copying result data...");
     RFCSI_EXPORT rfcsiExport;
     foreach(wstring memberName; __traits(allMembers, RFCSI_EXPORT))

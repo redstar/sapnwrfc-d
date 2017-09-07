@@ -292,7 +292,7 @@ int run(string[] args)
 
     if (verbose) writeln("Connecting...");
     RfcInit();
-    RFC_CONNECTION_PARAMETER[1] conParams = [ { cU("DEST"), cU(dest) } ];
+    RFC_CONNECTION_PARAMETER[1] conParams = [ { "DEST"w.ptr, cU(dest) } ];
     auto connection = RfcOpenConnection(conParams);
     scope(exit) RfcCloseConnection(connection);
 
