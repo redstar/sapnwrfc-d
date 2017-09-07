@@ -27,6 +27,7 @@ enum VERSION = "0.1";
 alias KEYWORDS = TypeTuple!(
     // General Connection parameters
     "DEST",
+    // The function name
     "FUNC",
 );
 
@@ -64,6 +65,7 @@ void usage(int rc = 1)
     writefln("\nOptions:");
     writefln("    -h       This help text");
     writefln("    -v       Enable verbose output");
+    writefln("    -lang=d  Output D code ");
     writefln("\nRecognized keys:");
     short col = 0;
     foreach (key; KEYWORDS)
@@ -81,56 +83,126 @@ void usage(int rc = 1)
 
 alias cU = toUTF16z;
 
-void dumpStructureOrTable(RFC_TYPE_DESC_HANDLE typeDescHandle, int level = 1)
+void dumpMetadataFields(alias GetCount, alias GetDescriptionByIndex, DESC, T)(T descHandle, int level, bool function(DESC) filter = function(DESC x) { return false; })
+    if(is(T == RFC_TYPE_DESC_HANDLE) || is(T == RFC_FUNCTION_DESC_HANDLE))
 {
-    immutable fieldCount = RfcGetFieldCount(typeDescHandle);
-    foreach (i; 0..fieldCount)
+    immutable count = GetCount(descHandle);
+    foreach (i; 0..count)
     {
-        RFC_FIELD_DESC fieldDesc;
-        RfcGetFieldDescByIndex(typeDescHandle, i, fieldDesc);
+        bool recurse = false;
+        DESC desc;
+        GetDescriptionByIndex(descHandle, i, desc);
+        if (filter(desc))
+            continue;
         foreach (j; 0..level)
             write("    ");
-        writef("%s ", fieldDesc.name[0..wcslen(fieldDesc.name.ptr)]);
-        switch (fieldDesc.type)
+        writef("%-24s ", desc.name[0..wcslen(desc.name.ptr)]);
+        final switch (desc.type)
         {
             case RFCTYPE.RFCTYPE_CHAR:
-                writef("CHAR[%d] ", fieldDesc.nucLength);
+                writef("CHAR     Length %d ", desc.nucLength);
                 break;
             case RFCTYPE.RFCTYPE_DATE:
-                writef("DATE ");
+                writef("DATE     Length %d", desc.nucLength);
                 break;
             case RFCTYPE.RFCTYPE_BCD:
-                writef("BCD ");
+                writef("BCD      Decimals %d", desc.decimals);
                 break;
             case RFCTYPE.RFCTYPE_TIME:
-                writef("TIME ");
+                writef("TIME");
                 break;
             case RFCTYPE.RFCTYPE_BYTE:
-                writef("BYTE[%d] ", fieldDesc.ucLength);
+                writef("BYTE     Length %d", desc.ucLength);
                 break;
             case RFCTYPE.RFCTYPE_INT:
-                writef("INT[%d] ", fieldDesc.ucLength);
+                writef("INT      Length %d", desc.ucLength);
                 break;
             case RFCTYPE.RFCTYPE_INT2:
-                writef("SHORT[%d] ", fieldDesc.ucLength);
+                writef("INT2     Length %d", desc.ucLength);
                 break;
             case RFCTYPE.RFCTYPE_INT1:
-                writef("BYTE[%d] ", fieldDesc.ucLength);
+                writef("INT1     Length %d", desc.ucLength);
+                break;
+            case RFCTYPE.RFCTYPE_INT8:
+                writef("INT8     Length %d", desc.ucLength);
+                break;
+            case RFCTYPE.RFCTYPE_DECF16:
+                writef("DEC16    Length %d", desc.ucLength);
+                break;
+            case RFCTYPE.RFCTYPE_DECF34:
+                writef("DEC34    Length %d", desc.ucLength);
+                break;
+            case RFCTYPE.RFCTYPE_FLOAT:
+                writef("FLOAT    Length %d", desc.ucLength);
+                break;
+            case RFCTYPE.RFCTYPE_NUM:
+                writef("NUM      Length %d", desc.nucLength);
+                break;
+            case RFCTYPE.RFCTYPE_STRING:
+                writef("STRING   Length %d", desc.ucLength);
+                break;
+            case RFCTYPE.RFCTYPE_XSTRING:
+                writef("XSTRING");
+                break;
+            case RFCTYPE.RFCTYPE_XMLDATA:
+                writef("XMLDATA  Length %d", desc.ucLength);
                 break;
             case RFCTYPE.RFCTYPE_TABLE:
-                writef("TABLE ");
+                writef("TABLE");
                 writeln();
-                dumpStructureOrTable(fieldDesc.typeDescHandle, level+1);
+                recurse = true;
+                dumpMetadataFields!(RfcGetFieldCount, RfcGetFieldDescByIndex, RFC_FIELD_DESC)(desc.typeDescHandle, level+1);
                 break;
             case RFCTYPE.RFCTYPE_STRUCTURE:
-                writef("STRUCTURE ");
+                writef("STRUCTURE");
                 writeln();
-                dumpStructureOrTable(fieldDesc.typeDescHandle, level+1);
+                recurse = true;
+                dumpMetadataFields!(RfcGetFieldCount, RfcGetFieldDescByIndex, RFC_FIELD_DESC)(desc.typeDescHandle, level+1);
                 break;
-            default:
-                writef("%d ", fieldDesc.type);
+            case RFCTYPE.RFCTYPE_NULL:
+                writef("NULL");
+                break;
+            case RFCTYPE.RFCTYPE_ABAPOBJECT:
+                writef("ABAPOBJECT");
+                break;
+            case RFCTYPE.RFCTYPE_UTCLONG:
+                writef("UTCLONG");
+                break;
+            case RFCTYPE.RFCTYPE_UTCSECOND:
+                writef("UTCSECOND");
+                break;
+            case RFCTYPE.RFCTYPE_UTCMINUTE:
+                writef("UTCMINUTE");
+                break;
+            case RFCTYPE.RFCTYPE_DTDAY:
+                writef("DTDAY");
+                break;
+            case RFCTYPE.RFCTYPE_DTWEEK:
+                writef("DTWEEK");
+                break;
+            case RFCTYPE.RFCTYPE_DTMONTH:
+                writef("DTMONTH");
+                break;
+            case RFCTYPE.RFCTYPE_TSECOND:
+                writef("TSECOND");
+                break;
+            case RFCTYPE.RFCTYPE_TMINUTE:
+                writef("TMINUTE");
+                break;
+            case RFCTYPE.RFCTYPE_CDAY:
+                writef("CDAY");
+                break;
+            case RFCTYPE.RFCTYPE_BOX:
+                writef("BOX");
+                break;
+            case RFCTYPE.RFCTYPE_GENERIC_BOX:
+                writef("GENERIC_BOX");
+                break;
+            case RFCTYPE._RFCTYPE_max_value:
+                writef("(max value?)");
+                break;
         }
-        writeln();
+        if (!recurse) writeln();
     }
 }
 
@@ -158,35 +230,8 @@ void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
         else static if (direction == RFC_DIRECTION.RFC_TABLES)
             writeln("TABLES");
 
-        foreach (i; 0..paramCount)
-        {
-            RFC_PARAMETER_DESC paramDesc;
-            RfcGetParameterDescByIndex(funcDesc, i, paramDesc);
-            if (paramDesc.direction != direction)
-                continue;
-            writef("    %-30s ", paramDesc.name[0..wcslen(paramDesc.name.ptr)]);
-            auto typestr = RfcGetTypeAsString(paramDesc.type);
-            writef("%-10s ", typestr[0..wcslen(typestr)]);
-            switch (paramDesc.type)
-            {
-                case RFCTYPE.RFCTYPE_CHAR:
-                case RFCTYPE.RFCTYPE_NUM:
-                    if (paramDesc.nucLength != 1)
-                        writef("Length %d ", paramDesc.nucLength);
-                    break;
-                case RFCTYPE.RFCTYPE_BYTE:
-                case RFCTYPE.RFCTYPE_INT:
-                case RFCTYPE.RFCTYPE_INT2:
-                case RFCTYPE.RFCTYPE_INT1:
-                    if (paramDesc.ucLength != 1)
-                        writef("Length %d ", paramDesc.ucLength);
-                    break;
-                default:
-                    break;
-            }
-            writeln();
-        }
-        writeln("\n");
+        dumpMetadataFields!(RfcGetParameterCount, RfcGetParameterDescByIndex, RFC_PARAMETER_DESC)(funcDesc, 1, function(RFC_PARAMETER_DESC d){ return d.direction != direction; });
+        writeln();
     }
     writeln("EXCEPTIONS");
     immutable excCount = RfcGetExceptionCount(funcDesc);
@@ -194,7 +239,7 @@ void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
     {
         RFC_EXCEPTION_DESC excDesc;
         RfcGetExceptionDescByIndex(funcDesc, i, excDesc);
-        writeln("    %s", excDesc.key[0..wcslen(excDesc.key.ptr)]);
+        writefln("    %s", excDesc.key[0..wcslen(excDesc.key.ptr)]);
     }
 }
 
