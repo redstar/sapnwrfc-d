@@ -33,6 +33,7 @@ Examples
 
 Examples are provided in the `examples` [folder](https://github.com/redstar/sapnwrfc-d/tree/master/examples/).
 
+- computeday shows how to call a simple RFC.
 - sapping connects to a SAP system and retrieves some system information. Useful for connection tests.
 - readtable calls RFC_READ_TABLE and exports the content of a database table.
 - repotool (WIP) displays the metadata for a function
