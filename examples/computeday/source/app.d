@@ -8,20 +8,6 @@ import std.string;
 import std.typetuple;
 import std.utf;
 
-version(Windows)
-{
-    import core.stdc.wchar_ : wcslen;
-}
-else
-{
-    private size_t wcslen(in const(wchar)* s)
-    {
-        const(wchar)* p = s;
-        while (*p) p++;
-        return p - s;
-    }
-}
-
 enum VERSION = "0.1";
 
 alias KEYWORDS = TypeTuple!(
@@ -59,7 +45,7 @@ string[] firstSplitOf(string s, char delim)
 
 void usage(int rc = 1)
 {
-    writefln("RepoTool V%s", VERSION);
+    writefln("ComputeDay V%s", VERSION);
     writefln("\nUsage:");
     writefln("    computedate [-h] [-v] (KEY=VALUE)+");
     writefln("\nOptions:");
@@ -76,7 +62,7 @@ void usage(int rc = 1)
     }
     writeln();
     writefln("\nExample:");
-    writefln("    repotool DEST=X01 DATE=20170907");
+    writefln("    computeday DEST=X01 DATE=20170907");
     throw new ExitException(rc);
 }
 
