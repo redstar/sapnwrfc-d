@@ -1,6 +1,7 @@
 module etc.c.sapnwrfc;
 
 public import etc.c.sapucx;
+public import etc.c.sapuc;
 
 extern(C):
 @nogc:

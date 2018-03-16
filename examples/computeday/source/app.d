@@ -66,8 +66,6 @@ void usage(int rc = 1)
     throw new ExitException(rc);
 }
 
-alias cU = toUTF16z;
-
 int run(string[] args)
 {
     if  (args.length == 0) usage();
