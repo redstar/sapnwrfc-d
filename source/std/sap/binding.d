@@ -248,6 +248,11 @@ RFC_CONNECTION_HANDLE RfcStartServer(int argc, SAP_UC** argv, in RFC_CONNECTION_
     return RfcStartServer(argc, argv, connectionParams.ptr, cast(uint)connectionParams.length);
 }
 
+RFC_FUNCTION_DESC_HANDLE RfcGetFunctionDesc(RFC_CONNECTION_HANDLE rfcHandle, in wstring name)
+{
+    return RfcGetFunctionDesc(rfcHandle, std.utf.toUTF16z(name));
+}
+
 // Data container getter
 
 void RfcGetChars(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer)
@@ -308,39 +313,53 @@ size_t RfcGetStringLengthByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index)
     return len;
 }
 
-void RfcGetInt(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out int value)
+int RfcGetInt(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+	int value;
     RfcGetInt(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
-void RfcGetInt1(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out ubyte value)
+ubyte RfcGetInt1(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+    ubyte value;
     RfcGetInt1(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
-void RfcGetInt2(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out short value)
+short RfcGetInt2(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+    short value;
     RfcGetInt2(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
-void RfcGetFloat(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out double value)
+double RfcGetFloat(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+    double value;
     RfcGetFloat(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
-void RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_STRUCTURE_HANDLE value)
+RFC_STRUCTURE_HANDLE RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+    RFC_STRUCTURE_HANDLE value;
     RfcGetStructure(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
-void RfcGetTable(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_TABLE_HANDLE value)
+RFC_TABLE_HANDLE RfcGetTable(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+    RFC_TABLE_HANDLE value;
     RfcGetTable(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
-void RfcGetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name, out RFC_ABAP_OBJECT_HANDLE value)
+RFC_ABAP_OBJECT_HANDLE RfcGetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
+    RFC_ABAP_OBJECT_HANDLE value;
     RfcGetAbapObject(dataHandle, std.utf.toUTF16z(name), value);
+    return value;
 }
 
 // Data container setter
