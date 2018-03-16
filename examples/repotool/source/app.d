@@ -8,20 +8,6 @@ import std.string;
 import std.typetuple;
 import std.utf;
 
-version(Windows)
-{
-    import core.stdc.wchar_ : wcslen;
-}
-else
-{
-    private size_t wcslen(in const(wchar)* s)
-    {
-        const(wchar)* p = s;
-        while (*p) p++;
-        return p - s;
-    }
-}
-
 enum VERSION = "0.1";
 
 alias KEYWORDS = TypeTuple!(
@@ -81,8 +67,6 @@ void usage(int rc = 1)
     throw new ExitException(rc);
 }
 
-alias cU = toUTF16z;
-
 void dumpMetadataFields(alias GetCount, alias GetDescriptionByIndex, DESC, T)(T descHandle, int level, bool function(DESC) filter = function(DESC x) { return false; })
     if(is(T == RFC_TYPE_DESC_HANDLE) || is(T == RFC_FUNCTION_DESC_HANDLE))
 {
@@ -96,7 +80,7 @@ void dumpMetadataFields(alias GetCount, alias GetDescriptionByIndex, DESC, T)(T 
             continue;
         foreach (j; 0..level)
             write("    ");
-        writef("%-24s ", desc.name[0..wcslen(desc.name.ptr)]);
+        writef("%-24s ", desc.name[0..strlenU16(desc.name.ptr)]);
         final switch (desc.type)
         {
             case RFCTYPE.RFCTYPE_CHAR:
@@ -149,13 +133,17 @@ void dumpMetadataFields(alias GetCount, alias GetDescriptionByIndex, DESC, T)(T 
                 break;
             case RFCTYPE.RFCTYPE_TABLE:
                 writef("TABLE");
-                writeln();
+                RFC_ABAP_NAME tname;
+                RfcGetTypeName(desc.typeDescHandle, tname);
+                writefln("    %s", tname[0..strlenU16(tname.ptr)]);
                 recurse = true;
                 dumpMetadataFields!(RfcGetFieldCount, RfcGetFieldDescByIndex, RFC_FIELD_DESC)(desc.typeDescHandle, level+1);
                 break;
             case RFCTYPE.RFCTYPE_STRUCTURE:
                 writef("STRUCTURE");
-                writeln();
+                RFC_ABAP_NAME tname;
+                RfcGetTypeName(desc.typeDescHandle, tname);
+                writefln("    %s", tname[0..strlenU16(tname.ptr)]);
                 recurse = true;
                 dumpMetadataFields!(RfcGetFieldCount, RfcGetFieldDescByIndex, RFC_FIELD_DESC)(desc.typeDescHandle, level+1);
                 break;
@@ -210,7 +198,7 @@ void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
 {
     RFC_ABAP_NAME name;
     RfcGetFunctionName(funcDesc, name);
-    writefln("FUNCTION\n    %s\n", name[0..wcslen(name.ptr)]);
+    writefln("FUNCTION\n    %s\n", name[0..strlenU16(name.ptr)]);
 
     immutable paramCount = RfcGetParameterCount(funcDesc);
     alias DIRECTION = TypeTuple!(
@@ -239,7 +227,7 @@ void dumpMetadata(RFC_FUNCTION_DESC_HANDLE funcDesc)
     {
         RFC_EXCEPTION_DESC excDesc;
         RfcGetExceptionDescByIndex(funcDesc, i, excDesc);
-        writefln("    %s", excDesc.key[0..wcslen(excDesc.key.ptr)]);
+        writefln("    %s", excDesc.key[0..strlenU16(excDesc.key.ptr)]);
     }
 }
 
@@ -297,7 +285,7 @@ int run(string[] args)
     scope(exit) RfcCloseConnection(connection);
 
     if (verbose) writeln("Retrieving function description...");
-    auto desc = RfcGetFunctionDesc(connection, cU(func));
+    auto desc = RfcGetFunctionDesc(connection, func);
 
     if (outputD)
         dumpMetadataAsD(desc);
