@@ -175,8 +175,8 @@ int run(string[] args)
         size_t len;
         wchar[512] buffer;
         RfcGetStringByIndex(dataTableHandle, 0, buffer, len);
-				writeln(buffer[0..len]);
-				if (--rows > 0)
+        writeln(buffer[0..len]);
+		if (--rows > 0)
             RfcMoveToNextRow(dataTableHandle);
     }
 
