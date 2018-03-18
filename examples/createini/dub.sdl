@@ -1,0 +1,7 @@
+name "createini"
+description "Creates sapnwrfc.ini from saplogon.ini"
+copyright "Copyright (C) 2018, Kai Nacke"
+authors "Kai Nacke"
+targetType "executable"
+
+
