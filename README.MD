@@ -15,7 +15,9 @@ The SAP NetWeaver RFC SDK is copyrighted software and is only available through 
 Installation
 ------------
 
-If you use [dub](https://github.com/rejectedsoftware/dub/) then you only need to add `sapnwrfc-d` to the dependencies of your project in the `dub.json` file:
+If you use [dub](https://github.com/rejectedsoftware/dub/) then you only need to add `sapnwrfc-d` to the dependencies of your project in the `dub.json` or `dub.sdl` file:
+
+`dub.json`:
 
     {
         /* Other stuf */
@@ -25,18 +27,23 @@ If you use [dub](https://github.com/rejectedsoftware/dub/) then you only need to
         }
     }
 
+`dub.sdl`:
+
+    dependency "sapnwrfc-d"
+
 Otherwise you have to compile all D files in the `source` folder into a library named `libsapnwrfc-d.a` (Linux) or `sapnwrfc-d.lib` (Windows).
 You also need to link against the libraries provided by the SAP NetWeaver RFC SDK. (Currently, only `libsapnwrfc.a`/`sapnwrfc.lib` is required.)
+On Windows I recommend that you add the `lib` folder of the SAP NetWeaver RFC SDK to the `LIB` and `PATH` environment variable.
 
 Examples
 --------
 
 Examples are provided in the `examples` [folder](https://github.com/redstar/sapnwrfc-d/tree/master/examples/).
 
-- computeday shows how to call a simple RFC.
-- sapping connects to a SAP system and retrieves some system information. Useful for connection tests.
-- readtable calls RFC_READ_TABLE and exports the content of a database table.
-- repotool displays the metadata for a function.
+- [computeday](tree/master/examples/computeday) shows how to call a simple RFC.
+- [sapping](tree/master/examples/sapping) connects to a SAP system and retrieves some system information. Useful for connection tests.
+- [readtable](tree/master/examples/readtable) calls RFC_READ_TABLE and exports the content of a database table.
+- [repotool](tree/master/examples/repotool) displays the metadata for a function.
 - (Idea: tool to execute arbitrary function by reading parameters in JSON format from stdio and outputing result as JSON to stdout) 
 
 Functionality
