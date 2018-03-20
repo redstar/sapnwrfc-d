@@ -9,20 +9,6 @@ import std.conv : to;
 import std.algorithm : endsWith, startsWith;
 static import std.utf;
 
-version(Windows)
-{
-    import core.stdc.wchar_ : wcslen;
-}
-else
-{
-    private size_t wcslen(in const(wchar)* s)
-    {
-        const(wchar)* p = s;
-        while (*p) p++;
-        return p - s;
-    }
-}
-
 class SAPException : Exception
 {
     private immutable RFC_ERROR_INFO errorInfo;
@@ -43,7 +29,7 @@ class SAPException : Exception
     @property wstring codeAsString()
     {
         auto rcmsg = RfcGetRcAsString(errorInfo.code);
-        return cast(wstring)rcmsg[0 .. wcslen(rcmsg)];
+        return cast(wstring)rcmsg[0 .. strlenU16(rcmsg)];
     }
 
     @property RFC_ERROR_GROUP group()
@@ -53,44 +39,44 @@ class SAPException : Exception
 
     @property wstring key()
     {
-        return errorInfo.key[0 .. wcslen(errorInfo.key.ptr)];
+        return errorInfo.key[0 .. strlenU16(errorInfo.key.ptr)];
     }
 
     @property wstring message()
     {
-        return cast(wstring)errorInfo.message[0 .. wcslen(errorInfo.message.ptr)];
+        return cast(wstring)errorInfo.message[0 .. strlenU16(errorInfo.message.ptr)];
     }
 
     @property wstring abapMsgClass()
     {
-        return cast(wstring)errorInfo.abapMsgClass[0 .. wcslen(errorInfo.abapMsgClass.ptr)];
+        return cast(wstring)errorInfo.abapMsgClass[0 .. strlenU16(errorInfo.abapMsgClass.ptr)];
     }
 
     @property wstring abapMsgType()
     {
-        return cast(wstring)errorInfo.abapMsgType[0 .. wcslen(errorInfo.abapMsgType.ptr)];
+        return cast(wstring)errorInfo.abapMsgType[0 .. strlenU16(errorInfo.abapMsgType.ptr)];
     }
 
     // abapMsgNumber ?
 
     @property wstring abapMsgV1()
     {
-        return cast(wstring)errorInfo.abapMsgV1[0 .. wcslen(errorInfo.abapMsgV1.ptr)];
+        return cast(wstring)errorInfo.abapMsgV1[0 .. strlenU16(errorInfo.abapMsgV1.ptr)];
     }
 
     @property wstring abapMsgV2()
     {
-        return cast(wstring)errorInfo.abapMsgV2[0 .. wcslen(errorInfo.abapMsgV2.ptr)];
+        return cast(wstring)errorInfo.abapMsgV2[0 .. strlenU16(errorInfo.abapMsgV2.ptr)];
     }
 
     @property wstring abapMsgV3()
     {
-        return cast(wstring)errorInfo.abapMsgV3[0 .. wcslen(errorInfo.abapMsgV3.ptr)];
+        return cast(wstring)errorInfo.abapMsgV3[0 .. strlenU16(errorInfo.abapMsgV3.ptr)];
     }
 
     @property wstring abapMsgV4()
     {
-        return cast(wstring)errorInfo.abapMsgV4[0 .. wcslen(errorInfo.abapMsgV4.ptr)];
+        return cast(wstring)errorInfo.abapMsgV4[0 .. strlenU16(errorInfo.abapMsgV4.ptr)];
     }
 }
 
