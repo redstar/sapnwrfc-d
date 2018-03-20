@@ -1,7 +1,7 @@
 ﻿/* Example application for SAP NetWeaver RFC
    Connect to SAP system, call ping and display information from RFC_SYSTEM_INFO.
 */
-import std.sap;
+import sapnwrfc;
 import std.conv;
 import std.stdio;
 import std.string;

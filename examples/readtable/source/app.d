@@ -1,7 +1,7 @@
 ﻿/* Example application for SAP NetWeaver RFC
    Execute RFC_READ_TABLE in SAP system and export result.
 */
-import std.sap;
+import sapnwrfc;
 import std.conv;
 import std.stdio;
 import std.string;
