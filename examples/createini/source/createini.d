@@ -9,7 +9,7 @@ private import std.string;
 private import std.stdio;
 private import std.traits : isSomeString;
 
-public import etc.c.sapnwrfc : RFC_CONNECTION_PARAMETER, cU;
+import etc.c.sapnwrfc : RFC_CONNECTION_PARAMETER, cU;
 import etc.c.sapuc : strlenU16;
 
 enum VERSION = "0.1";
