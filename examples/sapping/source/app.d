@@ -174,8 +174,7 @@ int run(string[] args)
     RfcInvoke(connection, func);
 
     if (verbose) writeln("Retrieving result data...");
-    RFC_STRUCTURE_HANDLE rfcsiStructureHandle;
-    RfcGetStructure(func, "RFCSI_EXPORT"w, rfcsiStructureHandle);
+    auto rfcsiStructureHandle = RfcGetStructure(func, "RFCSI_EXPORT");
     if (verbose) writeln("Copying result data...");
     RFCSI_EXPORT rfcsiExport;
     foreach(wstring memberName; __traits(allMembers, RFCSI_EXPORT))

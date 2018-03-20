@@ -142,8 +142,7 @@ int run(string[] args)
     if (fields != "")
     {
         auto allFields = std.string.split(fields, ",");
-        RFC_TABLE_HANDLE fieldsTableHandle;
-        RfcGetTable(func, "FIELDS"w, fieldsTableHandle);
+        auto fieldsTableHandle = RfcGetTable(func, "FIELDS");
         foreach (f; allFields)
         {
             RfcAppendNewRow(fieldsTableHandle);
@@ -154,8 +153,7 @@ int run(string[] args)
     {
         // FIXME: TEXT field is only up to 72 chars.
         //        Split line and append new row if longer
-        RFC_TABLE_HANDLE optionsTableHandle;
-        RfcGetTable(func, "OPTIONS"w, optionsTableHandle);
+        auto optionsTableHandle = RfcGetTable(func, "OPTIONS");
         RfcAppendNewRow(optionsTableHandle);
         RfcSetString(optionsTableHandle, "TEXT"w, options);
     }
@@ -163,8 +161,7 @@ int run(string[] args)
     RfcInvoke(connection, func);
 
     if (verbose) writeln("Retrieving result data...");
-    RFC_TABLE_HANDLE dataTableHandle;
-    RfcGetTable(func, "DATA"w, dataTableHandle);
+    auto dataTableHandle = RfcGetTable(func, "DATA");
     if (verbose) writeln("Copying result data...");
     uint rows;
     RfcGetRowCount(dataTableHandle, rows);
