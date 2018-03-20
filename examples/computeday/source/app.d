@@ -1,7 +1,7 @@
 ﻿/* Example application for SAP NetWeaver RFC
    Compute week day of date.
 */
-import std.sap;
+import sapnwrfc;
 import std.conv;
 import std.stdio;
 import std.string;

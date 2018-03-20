@@ -1,7 +1,7 @@
 ﻿/* Example application for SAP NetWeaver RFC
    Search for and display SAP repository information.
 */
-import std.sap;
+import sapnwrfc;
 import std.conv;
 import std.stdio;
 import std.string;
