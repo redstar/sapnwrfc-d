@@ -135,10 +135,10 @@ int run(string[] args)
     auto desc = RfcGetFunctionDesc(connection, cU(rfcfunc));
     auto func = RfcCreateFunction(desc);
     scope(exit) RfcDestroyFunction(func);
-    RfcSetString(func, "QUERY_TABLE"w, table);
-    RfcSetString(func, "NO_DATA"w, nodata != "" ? nodata : " "w);
-    RfcSetString(func, "DELIMITER"w, delimiter != "" ? delimiter : " "w);
-    if (maxrows != "") RfcSetString(func, "ROWCOUNT"w, maxrows);
+    RfcSetString(func, "QUERY_TABLE", table);
+    RfcSetString(func, "NO_DATA", nodata != "" ? nodata : " "w);
+    RfcSetString(func, "DELIMITER", delimiter != "" ? delimiter : " "w);
+    if (maxrows != "") RfcSetString(func, "ROWCOUNT", maxrows);
     if (fields != "")
     {
         auto allFields = std.string.split(fields, ",");
@@ -146,7 +146,7 @@ int run(string[] args)
         foreach (f; allFields)
         {
             RfcAppendNewRow(fieldsTableHandle);
-            RfcSetString(fieldsTableHandle, "FIELDNAME"w, f);
+            RfcSetString(fieldsTableHandle, "FIELDNAME", f);
         }
     }
     if (options != "")
@@ -155,7 +155,7 @@ int run(string[] args)
         //        Split line and append new row if longer
         auto optionsTableHandle = RfcGetTable(func, "OPTIONS");
         RfcAppendNewRow(optionsTableHandle);
-        RfcSetString(optionsTableHandle, "TEXT"w, options);
+        RfcSetString(optionsTableHandle, "TEXT", options);
     }
 
     RfcInvoke(connection, func);
