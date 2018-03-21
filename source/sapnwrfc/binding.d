@@ -239,6 +239,11 @@ RFC_FUNCTION_DESC_HANDLE RfcGetFunctionDesc(RFC_CONNECTION_HANDLE rfcHandle, in 
     return RfcGetFunctionDesc(rfcHandle, std.utf.toUTF16z(name));
 }
 
+void RfcMoveTo(RFC_TABLE_HANDLE handle, size_t index)
+{
+	RfcMoveTo(handle, cast(uint)index);
+}
+
 // Data container getter
 
 void RfcGetChars(DATA_CONTAINER_HANDLE dataHandle, in wstring name, wchar[] buffer)
@@ -380,9 +385,19 @@ void RfcSetBytesByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in ubyte
     RfcSetBytesByIndex(dataHandle, cast(uint)index, value.ptr, cast(uint)value.length);
 }
 
+void RfcSetString(DATA_CONTAINER_HANDLE dataHandle, const(SAP_UC)* name, const(SAP_UC)* value, size_t length)
+{
+	RfcSetString(dataHandle, name, value, cast(uint) length);
+}
+
 void RfcSetString(DATA_CONTAINER_HANDLE dataHandle, in wstring name, in wstring value)
 {
     RfcSetString(dataHandle, std.utf.toUTF16z(name), value.ptr, cast(uint)value.length);
+}
+
+void RfcSetStringByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, const(SAP_UC)* value, size_t length)
+{
+	RfcSetStringByIndex(dataHandle, cast(uint)index, value, cast(uint) length);
 }
 
 void RfcSetStringByIndex(DATA_CONTAINER_HANDLE dataHandle, size_t index, in wstring value)
