@@ -36,6 +36,19 @@ Otherwise you have to compile all D files in the `source` folder into a library 
 You also need to link against the libraries provided by the SAP NetWeaver RFC SDK. (Currently, only `libsapnwrfc.a`/`sapnwrfc.lib` is required.)
 On Windows I recommend that you add the `lib` folder of the SAP NetWeaver RFC SDK to the `LIB` and `PATH` environment variable.
 
+The library supports the SAP NetWeaver RFC SDK releases 7.20 and 7.50. To use the new functions and types of the 7.50 release please define the
+version identifier `sapnwrfc_sdk_750`:
+
+`dub.json`:
+
+    "versions": {
+        "sapnwrfc_sdk_750"
+    }
+
+`dub.sdl`:
+
+    versions "sapnwrfc_sdk_750"
+
 Examples
 --------
 

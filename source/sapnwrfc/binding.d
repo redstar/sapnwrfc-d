@@ -139,12 +139,26 @@ private string generate()
                             head ~= "ref ";
                         else static if (ParameterStorageClassTuple!member[idx] == STC.out_)
                             head ~= "out ";
+                        version(sapnwrfc_sdk_750)
+                        {
+                        alias Types = AliasSeq!(RFC_SERVER_ERROR_LISTENER, RFC_SERVER_STATE_CHANGE_LISTENER,
+                                                RFC_SERVER_FUNCTION, RFC_ON_CHECK_TRANSACTION, RFC_ON_COMMIT_TRANSACTION, RFC_ON_ROLLBACK_TRANSACTION,
+                                                RFC_ON_CONFIRM_TRANSACTION, RFC_FUNC_DESC_CALLBACK, RFC_PM_CALLBACK, RFC_ON_CHECK_UNIT, RFC_ON_COMMIT_UNIT,
+                                                RFC_ON_ROLLBACK_UNIT, RFC_ON_CONFIRM_UNIT, RFC_ON_GET_UNIT_STATE, RFC_ON_PASSWORD_CHANGE, RFC_ON_AUTHORIZATION_CHECK);
+                        alias Names = AliasSeq!("RFC_SERVER_ERROR_LISTENER", "RFC_SERVER_STATE_CHANGE_LISTENER",
+                                                "RFC_SERVER_FUNCTION", "RFC_ON_CHECK_TRANSACTION", "RFC_ON_COMMIT_TRANSACTION", "RFC_ON_ROLLBACK_TRANSACTION",
+                                                "RFC_ON_CONFIRM_TRANSACTION", "RFC_FUNC_DESC_CALLBACK", "RFC_PM_CALLBACK", "RFC_ON_CHECK_UNIT", "RFC_ON_COMMIT_UNIT",
+                                                "RFC_ON_ROLLBACK_UNIT", "RFC_ON_CONFIRM_UNIT", "RFC_ON_GET_UNIT_STATE", "RFC_ON_PASSWORD_CHANGE", "RFC_ON_AUTHORIZATION_CHECK");
+                        }
+                        else
+                        {
                         alias Types = AliasSeq!(RFC_SERVER_FUNCTION, RFC_ON_CHECK_TRANSACTION, RFC_ON_COMMIT_TRANSACTION, RFC_ON_ROLLBACK_TRANSACTION,
                                                 RFC_ON_CONFIRM_TRANSACTION, RFC_FUNC_DESC_CALLBACK, RFC_PM_CALLBACK, RFC_ON_CHECK_UNIT, RFC_ON_COMMIT_UNIT,
                                                 RFC_ON_ROLLBACK_UNIT, RFC_ON_CONFIRM_UNIT, RFC_ON_GET_UNIT_STATE, RFC_ON_PASSWORD_CHANGE, RFC_ON_AUTHORIZATION_CHECK);
                         alias Names = AliasSeq!("RFC_SERVER_FUNCTION", "RFC_ON_CHECK_TRANSACTION", "RFC_ON_COMMIT_TRANSACTION", "RFC_ON_ROLLBACK_TRANSACTION",
                                                 "RFC_ON_CONFIRM_TRANSACTION", "RFC_FUNC_DESC_CALLBACK", "RFC_PM_CALLBACK", "RFC_ON_CHECK_UNIT", "RFC_ON_COMMIT_UNIT",
                                                 "RFC_ON_ROLLBACK_UNIT", "RFC_ON_CONFIRM_UNIT", "RFC_ON_GET_UNIT_STATE", "RFC_ON_PASSWORD_CHANGE", "RFC_ON_AUTHORIZATION_CHECK");
+                        }
                         static if (staticIndexOf!(ParameterTypeTuple!member[idx], Types) >= 0)
                             head ~= Names[staticIndexOf!(ParameterTypeTuple!member[idx], Types)];
                         else

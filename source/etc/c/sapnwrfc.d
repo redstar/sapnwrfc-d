@@ -3,6 +3,11 @@ module etc.c.sapnwrfc;
 public import etc.c.sapucx;
 public import etc.c.sapuc;
 
+version(sapnwrfc_sdk_750)
+{
+import core.stdc.time : time_t;
+}
+
 extern(C):
 @nogc:
 
@@ -222,6 +227,11 @@ struct RFC_SERVER_CONTEXT
     RFC_TID tid;
     RFC_UNIT_IDENTIFIER* unitIdentifier;
     RFC_UNIT_ATTRIBUTES* unitAttributes;
+    version(sapnwrfc_sdk_750)
+    {
+        uint isStateful;
+        SAP_UC[33] sessionID;
+    }
 }
 
 struct _RFC_TYPE_DESC_HANDLE
@@ -258,6 +268,69 @@ struct _RFC_CONNECTION_HANDLE
     void* handle;
 }
 alias RFC_CONNECTION_HANDLE = _RFC_CONNECTION_HANDLE*;
+
+version(sapnwrfc_sdk_750)
+{
+struct _RFC_SERVER_HANDLE
+{
+    void* handle;
+}
+alias RFC_SERVER_HANDLE = _RFC_SERVER_HANDLE*;
+
+enum RFC_PROTOCOL_TYPE
+{
+    RFC_UNKOWN,
+    RFC_CLIENT,
+    RFC_STARTED_SERVER,
+    RFC_REGISTERED_SERVER,
+    RFC_MULTI_COUNT_REGISTERED_SERVER,
+    RFC_TCP_SOCKET_CLIENT,
+    RFC_TCP_SOCKET_SERVER
+}
+
+enum RFC_SERVER_STATE
+{
+    RFC_SERVER_INITIAL,
+    RFC_SERVER_STARTING,
+    RFC_SERVER_RUNNING,
+    RFC_SERVER_BROKEN,
+    RFC_SERVER_STOPPING,
+    RFC_SERVER_STOPPED
+}
+
+struct _RFC_SERVER_ATTRIBUTES
+{
+    SAP_UC* serverName;
+    RFC_PROTOCOL_TYPE type;
+    uint registrationCount;
+    RFC_SERVER_STATE state;
+    uint currentBusyCount;
+    uint peakBusyCount;
+}
+alias RFC_SERVER_ATTRIBUTES = _RFC_SERVER_ATTRIBUTES;
+
+alias RFC_SERVER_ERROR_LISTENER = void function(RFC_SERVER_HANDLE, RFC_ATTRIBUTES*, out RFC_ERROR_INFO);
+
+struct _RFC_STATE_CHANGE
+{
+    RFC_SERVER_STATE oldState;
+    RFC_SERVER_STATE newState;
+}
+alias RFC_STATE_CHANGE = _RFC_STATE_CHANGE;
+
+alias RFC_SERVER_STATE_CHANGE_LISTENER = void function(RFC_SERVER_HANDLE, RFC_STATE_CHANGE*);
+
+struct _RFC_SERVER_MONITOR_DATA
+{
+    RFC_ATTRIBUTES* clientInfo;
+    int isActive;
+    int isStateful;
+    SAP_UC[128] functionModuleName;
+    time_t lastActivity;
+}
+alias RFC_SERVER_MONITOR_DATA = _RFC_SERVER_MONITOR_DATA;
+
+} // sapnwrfc_sdk_750
 
 struct _RFC_TRANSACTION_HANDLE
 {
@@ -368,6 +441,10 @@ alias RFC_ON_AUTHORIZATION_CHECK = RFC_RC function(RFC_CONNECTION_HANDLE, RFC_SE
 
 RFC_RC RfcInit();
 const(SAP_UC)* RfcGetVersion(out uint, out uint, out uint);
+version(sapnwrfc_sdk_750)
+{
+RFC_RC RfcGetVersionInternal();
+}
 RFC_RC RfcSetIniPath(const(SAP_UC)*, out RFC_ERROR_INFO);
 RFC_RC RfcReloadIniFile(out RFC_ERROR_INFO);
 RFC_RC RfcSetTraceLevel(RFC_CONNECTION_HANDLE, const(SAP_UC)*, uint, out RFC_ERROR_INFO);
@@ -380,14 +457,28 @@ RFC_RC RfcSAPUCToUTF8(const(SAP_UC)*, uint, RFC_BYTE*, uint*, uint*, out RFC_ERR
 const(SAP_UC)* RfcGetRcAsString(RFC_RC);
 const(SAP_UC)* RfcGetTypeAsString(RFCTYPE);
 const(SAP_UC)* RfcGetDirectionAsString(RFC_DIRECTION);
+version(sapnwrfc_sdk_750)
+{
+const(SAP_UC)* RfcGetServerStateAsString(RFC_SERVER_STATE);
+}
 RFC_RC RfcLanguageIsoToSap(const(SAP_UC)*, SAP_UC*, out RFC_ERROR_INFO);
 RFC_RC RfcLanguageSapToIso(const(SAP_UC)*, SAP_UC*, out RFC_ERROR_INFO);
+
+version(sapnwrfc_sdk_750)
+{
+RFC_RC RfcGetSaplogonEntries(SAP_UC***, uint*, out RFC_ERROR_INFO);
+RFC_RC RfcFreeSaplogonEntries(SAP_UC***, uint*, out RFC_ERROR_INFO);
+} // sapnwrfc_sdk_750
 
 RFC_CONNECTION_HANDLE RfcOpenConnection(const(RFC_CONNECTION_PARAMETER)*, uint, out RFC_ERROR_INFO);
 RFC_CONNECTION_HANDLE RfcRegisterServer(const(RFC_CONNECTION_PARAMETER)*, uint, out RFC_ERROR_INFO);
 RFC_CONNECTION_HANDLE RfcStartServer(int, SAP_UC**, const(RFC_CONNECTION_PARAMETER)*, uint, out RFC_ERROR_INFO);
 RFC_RC RfcCloseConnection(RFC_CONNECTION_HANDLE, out RFC_ERROR_INFO);
 RFC_RC RfcIsConnectionHandleValid(RFC_CONNECTION_HANDLE, int*, out RFC_ERROR_INFO);
+version(sapnwrfc_sdk_750)
+{
+RFC_RC RfcCancel(RFC_CONNECTION_HANDLE, out RFC_ERROR_INFO);
+}
 RFC_RC RfcResetServerContext(RFC_CONNECTION_HANDLE, out RFC_ERROR_INFO);
 RFC_RC RfcPing(RFC_CONNECTION_HANDLE, out RFC_ERROR_INFO);
 RFC_RC RfcGetConnectionAttributes(RFC_CONNECTION_HANDLE, RFC_ATTRIBUTES*, out RFC_ERROR_INFO);
@@ -399,6 +490,20 @@ RFC_RC RfcSNCNameToKey(SAP_UC*, SAP_UC*, SAP_RAW *, uint*, out RFC_ERROR_INFO);
 RFC_RC RfcSNCKeyToName(SAP_UC*, SAP_RAW*, uint, SAP_UC*, uint, out RFC_ERROR_INFO);
 RFC_RC RfcListenAndDispatch (RFC_CONNECTION_HANDLE, int, out RFC_ERROR_INFO);
 RFC_RC RfcInvoke(RFC_CONNECTION_HANDLE, RFC_FUNCTION_HANDLE, out RFC_ERROR_INFO);
+
+version(sapnwrfc_sdk_750)
+{
+RFC_SERVER_HANDLE RfcCreateServer(const(RFC_CONNECTION_PARAMETER)*, uint, out RFC_ERROR_INFO);
+RFC_RC RfcDestroyServer(RFC_SERVER_HANDLE, out RFC_ERROR_INFO);
+RFC_RC RfcLaunchServer(RFC_SERVER_HANDLE, out RFC_ERROR_INFO);
+RFC_RC RfcShutdownServer(RFC_SERVER_HANDLE, uint, out RFC_ERROR_INFO);
+RFC_RC RfcGetServerAttributes(RFC_SERVER_HANDLE, RFC_SERVER_ATTRIBUTES*, out RFC_ERROR_INFO);
+RFC_RC RfcGetServerConnectionMonitorData(RFC_SERVER_HANDLE, uint*, RFC_SERVER_MONITOR_DATA**, out RFC_ERROR_INFO);
+RFC_RC RfcDestroyServerConnectionMonitorData(uint, RFC_SERVER_MONITOR_DATA*, out RFC_ERROR_INFO);
+RFC_RC RfcAddServerErrorListener(RFC_SERVER_HANDLE, RFC_SERVER_ERROR_LISTENER, out RFC_ERROR_INFO);
+RFC_RC RfcAddServerStateChangedListener(RFC_SERVER_HANDLE, RFC_SERVER_STATE_CHANGE_LISTENER, out RFC_ERROR_INFO);
+RFC_RC RfcSetServerStateful(RFC_CONNECTION_HANDLE, uint, out RFC_ERROR_INFO);
+} // sapnwrfc_sdk_750
 
 RFC_RC RfcGetTransactionID(RFC_CONNECTION_HANDLE, RFC_TID, out RFC_ERROR_INFO);
 RFC_TRANSACTION_HANDLE RfcCreateTransaction(RFC_CONNECTION_HANDLE, RFC_TID, const(SAP_UC)*, out RFC_ERROR_INFO);
@@ -470,6 +575,11 @@ RFC_RC RfcGetInt1(DATA_CONTAINER_HANDLE, const(SAP_UC)*, out RFC_INT1, out RFC_E
 RFC_RC RfcGetInt1ByIndex(DATA_CONTAINER_HANDLE, uint, out RFC_INT1, out RFC_ERROR_INFO);
 RFC_RC RfcGetInt2(DATA_CONTAINER_HANDLE, const(SAP_UC)*, out RFC_INT2, out RFC_ERROR_INFO);
 RFC_RC RfcGetInt2ByIndex(DATA_CONTAINER_HANDLE, uint, out RFC_INT2, out RFC_ERROR_INFO);
+version(sapnwrfc_sdk_750)
+{
+RFC_RC RfcGetInt8(DATA_CONTAINER_HANDLE, const(SAP_UC)*, out RFC_INT8, out RFC_ERROR_INFO);
+RFC_RC RfcGetInt8ByIndex(DATA_CONTAINER_HANDLE, uint, out RFC_INT8, out RFC_ERROR_INFO);
+}
 RFC_RC RfcGetFloat(DATA_CONTAINER_HANDLE, const(SAP_UC)*, out RFC_FLOAT, out RFC_ERROR_INFO);
 RFC_RC RfcGetFloatByIndex(DATA_CONTAINER_HANDLE, uint, out RFC_FLOAT, out RFC_ERROR_INFO);
 RFC_RC RfcGetDecF16(DATA_CONTAINER_HANDLE, const(SAP_UC)*, out RFC_DECF16, out RFC_ERROR_INFO);
@@ -505,6 +615,11 @@ RFC_RC RfcSetInt1(DATA_CONTAINER_HANDLE, const(SAP_UC)*, RFC_INT1, out RFC_ERROR
 RFC_RC RfcSetInt1ByIndex(DATA_CONTAINER_HANDLE, uint, RFC_INT1, out RFC_ERROR_INFO);
 RFC_RC RfcSetInt2(DATA_CONTAINER_HANDLE, const(SAP_UC)*, RFC_INT2, out RFC_ERROR_INFO);
 RFC_RC RfcSetInt2ByIndex(DATA_CONTAINER_HANDLE, uint, RFC_INT2, out RFC_ERROR_INFO);
+version(sapnwrfc_sdk_750)
+{
+RFC_RC RfcSetInt8(DATA_CONTAINER_HANDLE, const(SAP_UC)*, RFC_INT8, out RFC_ERROR_INFO);
+RFC_RC RfcSetInt8ByIndex(DATA_CONTAINER_HANDLE, uint, RFC_INT8, out RFC_ERROR_INFO);
+}
 RFC_RC RfcSetFloat(DATA_CONTAINER_HANDLE, const(SAP_UC)*, RFC_FLOAT, out RFC_ERROR_INFO);
 RFC_RC RfcSetFloatByIndex(DATA_CONTAINER_HANDLE, uint, RFC_FLOAT, out RFC_ERROR_INFO);
 RFC_RC RfcSetDecF16(DATA_CONTAINER_HANDLE, const(SAP_UC)*, RFC_DECF16, out RFC_ERROR_INFO);
@@ -535,6 +650,10 @@ RFC_CLASS_DESC_HANDLE RfcGetCachedClassDesc(const(SAP_UC)*, const(SAP_UC)*, out 
 RFC_CLASS_DESC_HANDLE RfcDescribeAbapObject(RFC_ABAP_OBJECT_HANDLE, out RFC_ERROR_INFO);
 RFC_RC RfcAddClassDesc(const(SAP_UC)*, RFC_CLASS_DESC_HANDLE, out RFC_ERROR_INFO);
 RFC_RC RfcRemoveClassDesc(const(SAP_UC)*, const(SAP_UC)*, out RFC_ERROR_INFO);
+version(sapnwrfc_sdk_750)
+{
+RFC_RC RfcClearRepository(const(SAP_UC)*, out RFC_ERROR_INFO);
+}
 RFC_TYPE_DESC_HANDLE RfcCreateTypeDesc(const(SAP_UC)*, out RFC_ERROR_INFO);
 RFC_RC RfcAddTypeField(RFC_TYPE_DESC_HANDLE, const(RFC_FIELD_DESC)*, out RFC_ERROR_INFO);
 RFC_RC RfcSetTypeLength(RFC_TYPE_DESC_HANDLE, uint, uint, out RFC_ERROR_INFO);

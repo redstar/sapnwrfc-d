@@ -4,5 +4,7 @@ license "BSD 3-clause"
 copyright "Copyright (C) 2015, Kai Nacke"
 authors "Kai Nacke"
 targetType "library"
+# Uncomment for release 7.50
+# versions "sapnwrfc_sdk_750"
 libs "sapnwrfc"
 
