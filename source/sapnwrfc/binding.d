@@ -4,6 +4,7 @@ module sapnwrfc.binding;
 
 import etc.c.sapnwrfc;
 
+import std.meta;
 import std.traits;
 import std.conv : to;
 import std.algorithm : endsWith, startsWith;
@@ -138,35 +139,14 @@ private string generate()
                             head ~= "ref ";
                         else static if (ParameterStorageClassTuple!member[idx] == STC.out_)
                             head ~= "out ";
-                        // FIXME: Use AliasSeq
-                        static if (is(ParameterTypeTuple!member[idx] == RFC_SERVER_FUNCTION))
-                            head ~= "RFC_SERVER_FUNCTION";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_CHECK_TRANSACTION))
-                            head ~= "RFC_ON_CHECK_TRANSACTION";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_COMMIT_TRANSACTION))
-                            head ~= "RFC_ON_COMMIT_TRANSACTION";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_ROLLBACK_TRANSACTION))
-                            head ~= "RFC_ON_ROLLBACK_TRANSACTION";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_CONFIRM_TRANSACTION))
-                            head ~= "RFC_ON_CONFIRM_TRANSACTION";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_FUNC_DESC_CALLBACK))
-                            head ~= "RFC_FUNC_DESC_CALLBACK";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_PM_CALLBACK))
-                            head ~= "RFC_PM_CALLBACK";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_CHECK_UNIT))
-                            head ~= "RFC_ON_CHECK_UNIT";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_COMMIT_UNIT))
-                            head ~= "RFC_ON_COMMIT_UNIT";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_ROLLBACK_UNIT))
-                            head ~= "RFC_ON_ROLLBACK_UNIT";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_CONFIRM_UNIT))
-                            head ~= "RFC_ON_CONFIRM_UNIT";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_GET_UNIT_STATE))
-                            head ~= "RFC_ON_GET_UNIT_STATE";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_PASSWORD_CHANGE))
-                            head ~= "RFC_ON_PASSWORD_CHANGE";
-                        else if (is(ParameterTypeTuple!member[idx] == RFC_ON_AUTHORIZATION_CHECK))
-                            head ~= "RFC_ON_AUTHORIZATION_CHECK";
+                        alias Types = AliasSeq!(RFC_SERVER_FUNCTION, RFC_ON_CHECK_TRANSACTION, RFC_ON_COMMIT_TRANSACTION, RFC_ON_ROLLBACK_TRANSACTION,
+                                                RFC_ON_CONFIRM_TRANSACTION, RFC_FUNC_DESC_CALLBACK, RFC_PM_CALLBACK, RFC_ON_CHECK_UNIT, RFC_ON_COMMIT_UNIT,
+                                                RFC_ON_ROLLBACK_UNIT, RFC_ON_CONFIRM_UNIT, RFC_ON_GET_UNIT_STATE, RFC_ON_PASSWORD_CHANGE, RFC_ON_AUTHORIZATION_CHECK);
+                        alias Names = AliasSeq!("RFC_SERVER_FUNCTION", "RFC_ON_CHECK_TRANSACTION", "RFC_ON_COMMIT_TRANSACTION", "RFC_ON_ROLLBACK_TRANSACTION",
+                                                "RFC_ON_CONFIRM_TRANSACTION", "RFC_FUNC_DESC_CALLBACK", "RFC_PM_CALLBACK", "RFC_ON_CHECK_UNIT", "RFC_ON_COMMIT_UNIT",
+                                                "RFC_ON_ROLLBACK_UNIT", "RFC_ON_CONFIRM_UNIT", "RFC_ON_GET_UNIT_STATE", "RFC_ON_PASSWORD_CHANGE", "RFC_ON_AUTHORIZATION_CHECK");
+                        static if (staticIndexOf!(ParameterTypeTuple!member[idx], Types) >= 0)
+                            head ~= Names[staticIndexOf!(ParameterTypeTuple!member[idx], Types)];
                         else
                             head ~= ParameterTypeTuple!member[idx].stringof;
                         head ~= " p" ~ to!string(idx) ~ ", ";
