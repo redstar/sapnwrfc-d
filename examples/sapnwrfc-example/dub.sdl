@@ -1,0 +1,6 @@
+name "sapnwrfc-example"
+description "An example rfc application"
+authors "Kai Nacke"
+copyright "Copyright © 2018, Kai Nacke"
+license "proprietary"
+dependency "sapnwrfc-d" version="~master" path="../../"
