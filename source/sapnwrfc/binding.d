@@ -233,6 +233,25 @@ RFC_FUNCTION_DESC_HANDLE RfcGetFunctionDesc(RFC_CONNECTION_HANDLE rfcHandle, in 
     return RfcGetFunctionDesc(rfcHandle, std.utf.toUTF16z(name));
 }
 
+RFC_TYPE_DESC_HANDLE RfcGetTypeDesc(RFC_CONNECTION_HANDLE rfcHandle, in wstring name)
+{
+    return RfcGetTypeDesc(rfcHandle, std.utf.toUTF16z(name));
+}
+
+RFC_PARAMETER_DESC RfcGetParameterDescByIndex(RFC_FUNCTION_DESC_HANDLE rfcHandle, size_t idx)
+{
+    RFC_PARAMETER_DESC desc;
+    RfcGetParameterDescByIndex(rfcHandle, cast(uint)idx, desc);
+    return desc;
+}
+
+RFC_PARAMETER_DESC RfcGetParameterDescByName(RFC_FUNCTION_DESC_HANDLE rfcHandle, in wstring name)
+{
+    RFC_PARAMETER_DESC desc;
+    RfcGetParameterDescByName(rfcHandle, std.utf.toUTF16z(name), desc);
+    return desc;
+}
+
 void RfcMoveTo(RFC_TABLE_HANDLE handle, size_t index)
 {
 	RfcMoveTo(handle, cast(uint)index);
