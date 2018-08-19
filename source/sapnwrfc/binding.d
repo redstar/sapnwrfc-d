@@ -238,6 +238,34 @@ RFC_TYPE_DESC_HANDLE RfcGetTypeDesc(RFC_CONNECTION_HANDLE rfcHandle, in wstring 
     return RfcGetTypeDesc(rfcHandle, std.utf.toUTF16z(name));
 }
 
+RFC_EXCEPTION_DESC RfcGetExceptionDescByIndex(RFC_FUNCTION_DESC_HANDLE rfcHandle, size_t idx)
+{
+    RFC_EXCEPTION_DESC desc;
+    RfcGetExceptionDescByIndex(rfcHandle, cast(uint)idx, desc);
+    return desc;
+}
+
+RFC_EXCEPTION_DESC RfcGetExceptionDescByName(RFC_FUNCTION_DESC_HANDLE rfcHandle, in wstring name)
+{
+    RFC_EXCEPTION_DESC desc;
+    RfcGetExceptionDescByName(rfcHandle, std.utf.toUTF16z(name), desc);
+    return desc;
+}
+
+RFC_FIELD_DESC RfcGetFieldDescByIndex(RFC_TYPE_DESC_HANDLE rfcHandle, size_t idx)
+{
+    RFC_FIELD_DESC desc;
+    RfcGetFieldDescByIndex(rfcHandle, cast(uint)idx, desc);
+    return desc;
+}
+
+RFC_FIELD_DESC RfcGetFieldDescByName(RFC_TYPE_DESC_HANDLE rfcHandle, in wstring name)
+{
+    RFC_FIELD_DESC desc;
+    RfcGetFieldDescByName(rfcHandle, std.utf.toUTF16z(name), desc);
+    return desc;
+}
+
 RFC_PARAMETER_DESC RfcGetParameterDescByIndex(RFC_FUNCTION_DESC_HANDLE rfcHandle, size_t idx)
 {
     RFC_PARAMETER_DESC desc;
@@ -255,6 +283,20 @@ RFC_PARAMETER_DESC RfcGetParameterDescByName(RFC_FUNCTION_DESC_HANDLE rfcHandle,
 void RfcMoveTo(RFC_TABLE_HANDLE handle, size_t index)
 {
 	RfcMoveTo(handle, cast(uint)index);
+}
+
+wstring RfcGetFunctionName(RFC_FUNCTION_DESC_HANDLE handle)
+{
+    RFC_ABAP_NAME name;
+    RfcGetFunctionName(handle, name);
+    return name[0..strlenU16(name.ptr)].idup;
+}
+
+wstring RfcGetTypeName(RFC_TYPE_DESC_HANDLE handle)
+{
+    RFC_ABAP_NAME name;
+    RfcGetTypeName(handle, name);
+    return name[0..strlenU16(name.ptr)].idup;
 }
 
 // Data container getter
