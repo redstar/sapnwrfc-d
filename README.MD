@@ -57,7 +57,7 @@ Examples are provided in the `examples` [folder](https://github.com/redstar/sapn
 - [computeday](https://github.com/redstar/sapnwrfc-d/tree/master/examples/computeday) shows how to call a simple RFC.
 - [sapping](https://github.com/redstar/sapnwrfc-d/tree/master/examples/sapping) connects to a SAP system and retrieves some system information. Useful for connection tests.
 - [readtable](https://github.com/redstar/sapnwrfc-d/tree/master/examples/readtable) calls RFC_READ_TABLE and exports the content of a database table.
-- [repotool](https://github.com/redstar/sapnwrfc-d/tree/master/examples/repotool) displays the metadata for a function.
+- [repotool](https://github.com/redstar/sapnwrfc-d/tree/master/examples/repotool) displays the metadata for a function and can generate D source code for calling this function.
 - [createini](https://github.com/redstar/sapnwrfc-d/tree/master/examples/createini) parses a `saplogon.ini` file and writes the information for a `sapnwrfc.ini` file to the screen.
 - (Idea: tool to execute arbitrary function by reading parameters in JSON format from stdio and outputing result as JSON to stdout) 
 
