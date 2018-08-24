@@ -47,7 +47,7 @@ void usage(int rc = 1)
 {
     writefln("RepoTool V%s", VERSION);
     writefln("\nUsage:");
-    writefln("    repotool [-h] [-v] (KEY=VALUE)+");
+    writefln("    repotool [-h] [-v] [-lang=d] (KEY=VALUE)+");
     writefln("\nOptions:");
     writefln("    -h       This help text");
     writefln("    -v       Enable verbose output");
