@@ -387,25 +387,40 @@ double RfcGetFloat(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
     return value;
 }
 
-RFC_STRUCTURE_HANDLE RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
+RFC_STRUCTURE_HANDLE RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in const(wchar)* name)
 {
     RFC_STRUCTURE_HANDLE value;
-    RfcGetStructure(dataHandle, std.utf.toUTF16z(name), value);
+    RfcGetStructure(dataHandle, name, value);
+    return value;
+}
+
+RFC_STRUCTURE_HANDLE RfcGetStructure(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
+{
+    return RfcGetStructure(dataHandle, std.utf.toUTF16z(name));
+}
+
+RFC_TABLE_HANDLE RfcGetTable(DATA_CONTAINER_HANDLE dataHandle, in const(wchar)* name)
+{
+    RFC_TABLE_HANDLE value;
+    RfcGetTable(dataHandle, name, value);
     return value;
 }
 
 RFC_TABLE_HANDLE RfcGetTable(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
-    RFC_TABLE_HANDLE value;
-    RfcGetTable(dataHandle, std.utf.toUTF16z(name), value);
+    return RfcGetTable(dataHandle, std.utf.toUTF16z(name));
+}
+
+RFC_ABAP_OBJECT_HANDLE RfcGetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in const(wchar)* name)
+{
+    RFC_ABAP_OBJECT_HANDLE value;
+    RfcGetAbapObject(dataHandle, name, value);
     return value;
 }
 
 RFC_ABAP_OBJECT_HANDLE RfcGetAbapObject(DATA_CONTAINER_HANDLE dataHandle, in wstring name)
 {
-    RFC_ABAP_OBJECT_HANDLE value;
-    RfcGetAbapObject(dataHandle, std.utf.toUTF16z(name), value);
-    return value;
+    return RfcGetAbapObject(dataHandle, std.utf.toUTF16z(name));
 }
 
 // Data container setter
